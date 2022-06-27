@@ -18,11 +18,14 @@ MainComponent::MainComponent() {
 
     addAndMakeVisible(playButton);
     addAndMakeVisible(stopButton);
+    addAndMakeVisible(loadButton);
     addAndMakeVisible(volSlider);
 
     playButton.addListener(this);
     stopButton.addListener(this);
+    loadButton.addListener(this);
     volSlider.addListener(this);
+    volSlider.setRange(0.0, 1.0);
 }
 
 MainComponent::~MainComponent() {
@@ -43,7 +46,12 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate
     dphase = 0.0001;
 
     formatManager.registerBasicFormats();
-    juce::URL audioURL{"file:///home/cristi/aon_inspired.mp3"};
+
+    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+}
+
+void MainComponent::loadURL(juce::URL audioURL) {
+//    juce::URL audioURL{"file:///home/cristi/aon_inspired.mp3"};
     // Convert the autoURL to an input stream
 
 //    auto *reader = formatManager.createReaderFor(audioURL.createInputStream(false));
@@ -58,30 +66,11 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate
         // if something goes wrong
         readerSource.reset(newSource.release());
         // start the transport source
-        transportSource.start();
     }
-    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) {
     transportSource.getNextAudioBlock(bufferToFill);
-    // Your audio-processing code goes here!
-
-//    auto *leftChan = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
-//    auto *rightChan = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
-//    for (auto i = 0; i < bufferToFill.numSamples; ++i) {
-////        auto sample = rand.nextFloat() * 0.2f;
-////        auto sample = fmod(phase, 0.2);
-//        auto sample = sin(phase);
-//        leftChan[i] = sample;
-//        rightChan[i] = sample;
-//        phase += dphase;
-//    }
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
-
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    // bufferToFill.clearActiveBufferRegion();
 }
 
 void MainComponent::releaseResources() {
@@ -94,12 +83,28 @@ void MainComponent::releaseResources() {
 
 void MainComponent::buttonClicked(juce::Button *button) {
     std::cout << "Button was clicked: " << button->getName() << "\n";
+    if (button == &playButton) {
+        transportSource.start();
+
+    }
+    if (button == &stopButton) {
+        transportSource.stop();
+    }
+    if (button == &loadButton) {
+        juce::FileChooser chooser("Select file");
+        if (chooser.browseForFileToOpen()) {
+            loadURL(juce::URL{chooser.getResult()});
+        }
+    }
 }
 
 
 void MainComponent::sliderValueChanged(juce::Slider *slider) {
     std::cout << "Slider was changed: " << slider->getValue() << "\n";
-    dphase = slider->getValue() * 0.001;
+//    dphase = slider->getValue() * 0.001;
+    if (slider == &volSlider) {
+        transportSource.setGain(slider->getValue());
+    }
 }
 
 //==============================================================================
@@ -118,4 +123,5 @@ void MainComponent::resized() {
     playButton.setBounds(0, 0, getWidth(), rowHeight);
     stopButton.setBounds(0, rowHeight, getWidth(), rowHeight);
     volSlider.setBounds(0, 2 * rowHeight, getWidth(), getHeight() / 5);
+    loadButton.setBounds(0, 3 * rowHeight, getWidth(), rowHeight);
 }

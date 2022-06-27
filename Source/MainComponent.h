@@ -37,14 +37,20 @@ private:
     // Your private member variables go here...
     juce::TextButton playButton{"PLAY"};
     juce::TextButton stopButton{"STOP"};
+    juce::TextButton loadButton{"LOAD"};
+
     juce::Slider volSlider;
+
     juce::Random rand;
+
     double phase;
     double dphase;
 
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
+
+    void loadURL(juce::URL);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
