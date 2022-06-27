@@ -40,22 +40,43 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate
 
     // For more details, see the help for AudioProcessor::prepareToPlay()
     phase = 0;
-//    dphase = 0.005;
+    dphase = 0.0001;
+
+    formatManager.registerBasicFormats();
+    juce::URL audioURL{"file:///home/cristi/aon_inspired.mp3"};
+    // Convert the autoURL to an input stream
+
+//    auto *reader = formatManager.createReaderFor(audioURL.createInputStream(false));
+    auto *reader = formatManager.createReaderFor(
+            audioURL.createInputStream(juce::URL::InputStreamOptions{juce::URL::ParameterHandling::inAddress}));
+    // if the file is good
+    if (reader != nullptr) {
+        // create a source
+        std::unique_ptr<juce::AudioFormatReaderSource> newSource(new juce::AudioFormatReaderSource(reader, true));
+        // pass to transport source
+        transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
+        // if something goes wrong
+        readerSource.reset(newSource.release());
+        // start the transport source
+        transportSource.start();
+    }
+    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) {
+    transportSource.getNextAudioBlock(bufferToFill);
     // Your audio-processing code goes here!
 
-    auto *leftChan = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
-    auto *rightChan = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
-    for (auto i = 0; i < bufferToFill.numSamples; ++i) {
-//        auto sample = rand.nextFloat() * 0.2f;
-//        auto sample = fmod(phase, 0.2);
-        auto sample = sin(phase);
-        leftChan[i] = sample;
-        rightChan[i] = sample;
-        phase += dphase;
-    }
+//    auto *leftChan = bufferToFill.buffer->getWritePointer(0, bufferToFill.startSample);
+//    auto *rightChan = bufferToFill.buffer->getWritePointer(1, bufferToFill.startSample);
+//    for (auto i = 0; i < bufferToFill.numSamples; ++i) {
+////        auto sample = rand.nextFloat() * 0.2f;
+////        auto sample = fmod(phase, 0.2);
+//        auto sample = sin(phase);
+//        leftChan[i] = sample;
+//        rightChan[i] = sample;
+//        phase += dphase;
+//    }
     // For more details, see the help for AudioProcessor::getNextAudioBlock()
 
     // Right now we are not producing any data, in which case we need to clear the buffer
@@ -66,7 +87,7 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo &buffer
 void MainComponent::releaseResources() {
     // This will be called when the audio device stops, or when it is being
     // restarted due to a setting change.
-
+    transportSource.releaseResources();
     // For more details, see the help for AudioProcessor::releaseResources()
 }
 
