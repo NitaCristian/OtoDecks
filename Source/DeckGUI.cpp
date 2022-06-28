@@ -30,11 +30,14 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     loadButton.addListener(this);
 
     gainSlider.addListener(this);
-    speedSlider.addListener(this);
-    posSlider.addListener(this);
-
     gainSlider.setRange(0.0, 1.0);
+    gainSlider.setValue(1.0);
+
+    speedSlider.addListener(this);
     speedSlider.setRange(0.0, 100.0);
+    speedSlider.setValue(1.0);
+
+    posSlider.addListener(this);
     posSlider.setRange(0.0, 1.0);
 }
 
