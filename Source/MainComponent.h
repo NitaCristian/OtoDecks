@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "DJAudioPlayer.h"
 
 //==============================================================================
 /*
@@ -33,27 +34,15 @@ public:
     void sliderValueChanged(juce::Slider *slider) override;
 
 private:
-    //==============================================================================
-    // Your private member variables go here...
     juce::TextButton playButton{"PLAY"};
     juce::TextButton stopButton{"STOP"};
     juce::TextButton loadButton{"LOAD"};
 
     juce::Slider volSlider;
     juce::Slider speedSlider;
+    juce::Slider posSlider;
 
-    juce::Random rand;
-
-    double phase;
-    double dphase;
-
-    juce::AudioFormatManager formatManager;
-    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
-    juce::AudioTransportSource transportSource;
-
-    juce::ResamplingAudioSource resampleSource {&transportSource, false};
-
-    void loadURL(juce::URL);
+    DJAudioPlayer player1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
