@@ -30,11 +30,14 @@ public:
 
 private:
 
+    juce::AudioFormatManager formatManager;
+    juce::AudioThumbnailCache thumbnailCache{100};
+
     DJAudioPlayer player1;
-    DeckGUI deckGUI1{&player1};
+    DeckGUI deckGUI1{&player1, formatManager, thumbnailCache};
 
     DJAudioPlayer player2;
-    DeckGUI deckGUI2{&player2};
+    DeckGUI deckGUI2{&player2, formatManager, thumbnailCache};
 
     juce::MixerAudioSource mixerSource;
 

@@ -12,7 +12,9 @@
 #include "DeckGUI.h"
 
 //==============================================================================
-DeckGUI::DeckGUI(DJAudioPlayer *_player) : djAudioPlayer{_player} {
+DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse,
+                 juce::AudioThumbnailCache &cacheToUse) :
+        djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse) {
     addAndMakeVisible(playButton);
     addAndMakeVisible(stopButton);
     addAndMakeVisible(loadButton);
@@ -20,6 +22,8 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player) : djAudioPlayer{_player} {
     addAndMakeVisible(gainSlider);
     addAndMakeVisible(speedSlider);
     addAndMakeVisible(posSlider);
+
+    addAndMakeVisible(waveformDisplay);
 
     playButton.addListener(this);
     stopButton.addListener(this);
@@ -42,15 +46,16 @@ void DeckGUI::paint(juce::Graphics &g) {
 }
 
 void DeckGUI::resized() {
-    auto rowHeight = getHeight() / 6;
+    auto rowHeight = getHeight() / 8;
     playButton.setBounds(0, 0, getWidth(), rowHeight);
     stopButton.setBounds(0, rowHeight, getWidth(), rowHeight);
 
-    gainSlider.setBounds(0, 2 * rowHeight, getWidth(), getHeight() / 5);
-    speedSlider.setBounds(0, 3 * rowHeight, getWidth(), getHeight() / 5);
-    posSlider.setBounds(0, 4 * rowHeight, getWidth(), getHeight() / 5);
+    gainSlider.setBounds(0, 2 * rowHeight, getWidth(), rowHeight);
+    speedSlider.setBounds(0, 3 * rowHeight, getWidth(), rowHeight);
+    posSlider.setBounds(0, 4 * rowHeight, getWidth(), rowHeight);
 
-    loadButton.setBounds(0, 5 * rowHeight, getWidth(), rowHeight);
+    waveformDisplay.setBounds(0, 5 * rowHeight, getWidth(), rowHeight * 2);
+    loadButton.setBounds(0, 7 * rowHeight, getWidth(), rowHeight);
 }
 
 void DeckGUI::buttonClicked(juce::Button *button) {
@@ -63,7 +68,9 @@ void DeckGUI::buttonClicked(juce::Button *button) {
     if (button == &loadButton) {
         juce::FileChooser chooser("Select file");
         if (chooser.browseForFileToOpen()) {
-            djAudioPlayer->loadURL(juce::URL{chooser.getResult()});
+            auto audioURL = juce::URL{chooser.getResult()};
+            djAudioPlayer->loadURL(audioURL);
+            waveformDisplay.loadURL(audioURL);
         }
     }
 }
