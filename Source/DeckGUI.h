@@ -45,11 +45,11 @@ private:
     juce::TextButton stopButton{"STOP"};
     juce::TextButton loadButton{"LOAD"};
 
-    juce::Slider volSlider;
+    juce::Slider gainSlider;
     juce::Slider speedSlider;
     juce::Slider posSlider;
 
-    DJAudioPlayer *player;
+    DJAudioPlayer *djAudioPlayer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeckGUI)
 };

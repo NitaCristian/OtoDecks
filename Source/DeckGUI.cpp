@@ -12,12 +12,12 @@
 #include "DeckGUI.h"
 
 //==============================================================================
-DeckGUI::DeckGUI(DJAudioPlayer *_player) : player{_player} {
+DeckGUI::DeckGUI(DJAudioPlayer *_player) : djAudioPlayer{_player} {
     addAndMakeVisible(playButton);
     addAndMakeVisible(stopButton);
     addAndMakeVisible(loadButton);
 
-    addAndMakeVisible(volSlider);
+    addAndMakeVisible(gainSlider);
     addAndMakeVisible(speedSlider);
     addAndMakeVisible(posSlider);
 
@@ -25,11 +25,12 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player) : player{_player} {
     stopButton.addListener(this);
     loadButton.addListener(this);
 
-    volSlider.addListener(this);
+    gainSlider.addListener(this);
     speedSlider.addListener(this);
     posSlider.addListener(this);
 
-    volSlider.setRange(0.0, 1.0);
+    gainSlider.setRange(0.0, 1.0);
+    speedSlider.setRange(0.0, 100.0);
     posSlider.setRange(0.0, 1.0);
 }
 
@@ -44,36 +45,38 @@ void DeckGUI::resized() {
     auto rowHeight = getHeight() / 6;
     playButton.setBounds(0, 0, getWidth(), rowHeight);
     stopButton.setBounds(0, rowHeight, getWidth(), rowHeight);
-    volSlider.setBounds(0, 2 * rowHeight, getWidth(), getHeight() / 5);
+
+    gainSlider.setBounds(0, 2 * rowHeight, getWidth(), getHeight() / 5);
     speedSlider.setBounds(0, 3 * rowHeight, getWidth(), getHeight() / 5);
     posSlider.setBounds(0, 4 * rowHeight, getWidth(), getHeight() / 5);
+
     loadButton.setBounds(0, 5 * rowHeight, getWidth(), rowHeight);
 }
 
 void DeckGUI::buttonClicked(juce::Button *button) {
     if (button == &playButton) {
-        player->start();
+        djAudioPlayer->start();
     }
     if (button == &stopButton) {
-        player->stop();
+        djAudioPlayer->stop();
     }
     if (button == &loadButton) {
         juce::FileChooser chooser("Select file");
         if (chooser.browseForFileToOpen()) {
-            player->loadURL(juce::URL{chooser.getResult()});
+            djAudioPlayer->loadURL(juce::URL{chooser.getResult()});
         }
     }
 }
 
 void DeckGUI::sliderValueChanged(juce::Slider *slider) {
-    if (slider == &volSlider) {
-        player->setGain(slider->getValue());
+    if (slider == &gainSlider) {
+        djAudioPlayer->setGain(slider->getValue());
     }
     if (slider == &speedSlider) {
-        player->setSpeed(slider->getValue());
+        djAudioPlayer->setSpeed(slider->getValue());
     }
     if (slider == &posSlider) {
-        player->setPositionRelative(slider->getValue());
+        djAudioPlayer->setPositionRelative(slider->getValue());
     }
 }
 
@@ -82,7 +85,9 @@ bool DeckGUI::isInterestedInFileDrag(const juce::StringArray &files) {
 }
 
 void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y) {
-    if (files.size() == 1) {
-        player->loadURL(juce::URL{juce::File{files[0]}});
+    for (const auto &filename: files) {
+        juce::URL fileURL = juce::URL{juce::File{filename}};
+        djAudioPlayer->loadURL(fileURL);
+        return;
     }
 }
