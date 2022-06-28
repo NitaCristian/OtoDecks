@@ -54,7 +54,7 @@ void DJAudioPlayer::setGain(double gain) {
 }
 
 void DJAudioPlayer::setSpeed(double ratio) {
-    if (ratio < 0.0 || ratio > 100.0) {
+    if (ratio <= 0.0 || ratio > 100.0) {
         std::cout << "Error: The ratio needs to be between 0.0 and 100.0.\n";
         return;
     }
