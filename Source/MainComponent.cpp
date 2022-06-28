@@ -20,11 +20,13 @@ MainComponent::MainComponent() {
     addAndMakeVisible(stopButton);
     addAndMakeVisible(loadButton);
     addAndMakeVisible(volSlider);
+    addAndMakeVisible(speedSlider);
 
     playButton.addListener(this);
     stopButton.addListener(this);
     loadButton.addListener(this);
     volSlider.addListener(this);
+    speedSlider.addListener(this);
     volSlider.setRange(0.0, 1.0);
 }
 
@@ -48,6 +50,7 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate
     formatManager.registerBasicFormats();
 
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::loadURL(juce::URL audioURL) {
@@ -70,7 +73,8 @@ void MainComponent::loadURL(juce::URL audioURL) {
 }
 
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) {
-    transportSource.getNextAudioBlock(bufferToFill);
+//    transportSource.getNextAudioBlock(bufferToFill);
+    resampleSource.getNextAudioBlock(bufferToFill);
 }
 
 void MainComponent::releaseResources() {
@@ -105,6 +109,9 @@ void MainComponent::sliderValueChanged(juce::Slider *slider) {
     if (slider == &volSlider) {
         transportSource.setGain(slider->getValue());
     }
+    if (slider == &speedSlider) {
+        resampleSource.setResamplingRatio(slider->getValue());
+    }
 }
 
 //==============================================================================
@@ -123,5 +130,6 @@ void MainComponent::resized() {
     playButton.setBounds(0, 0, getWidth(), rowHeight);
     stopButton.setBounds(0, rowHeight, getWidth(), rowHeight);
     volSlider.setBounds(0, 2 * rowHeight, getWidth(), getHeight() / 5);
-    loadButton.setBounds(0, 3 * rowHeight, getWidth(), rowHeight);
+    speedSlider.setBounds(0, 3 * rowHeight, getWidth(), getHeight() / 5);
+    loadButton.setBounds(0, 4 * rowHeight, getWidth(), rowHeight);
 }

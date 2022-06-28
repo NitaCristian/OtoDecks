@@ -40,6 +40,7 @@ private:
     juce::TextButton loadButton{"LOAD"};
 
     juce::Slider volSlider;
+    juce::Slider speedSlider;
 
     juce::Random rand;
 
@@ -49,6 +50,8 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
+
+    juce::ResamplingAudioSource resampleSource {&transportSource, false};
 
     void loadURL(juce::URL);
 
