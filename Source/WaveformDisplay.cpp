@@ -13,7 +13,7 @@
 
 //==============================================================================
 WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse) :
-        audioThumbnail(1000, formatManagerToUse, cacheToUse), fileLoaded(false) {
+        audioThumbnail(1000, formatManagerToUse, cacheToUse), fileLoaded(false), position(0.0) {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
     audioThumbnail.addChangeListener(this);
@@ -42,7 +42,11 @@ void WaveformDisplay::paint(juce::Graphics &g) {
                    juce::Justification::centred, true);   // draw some placeholder text
         return;
     }
+
     audioThumbnail.drawChannel(g, getLocalBounds(), 0, audioThumbnail.getTotalLength(), 0, 1);
+
+    g.setColour(juce::Colours::lightgreen);
+    g.drawRect(position * getWidth(), 0, getWidth() / 20, getHeight());
 }
 
 void WaveformDisplay::resized() {
@@ -55,4 +59,11 @@ void WaveformDisplay::loadURL(const juce::URL &audioURL) {
 
 void WaveformDisplay::changeListenerCallback(juce::ChangeBroadcaster *source) {
     repaint();
+}
+
+void WaveformDisplay::setPositionRelative(double pos) {
+    if (pos != position && !std::isnan(pos)) {
+        position = pos;
+        repaint();
+    }
 }

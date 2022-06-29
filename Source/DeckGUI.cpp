@@ -39,9 +39,12 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
 
     posSlider.addListener(this);
     posSlider.setRange(0.0, 1.0);
+
+    startTimer(500);
 }
 
 DeckGUI::~DeckGUI() {
+    stopTimer();
 }
 
 void DeckGUI::paint(juce::Graphics &g) {
@@ -101,3 +104,8 @@ void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y) {
         return;
     }
 }
+
+void DeckGUI::timerCallback() {
+    waveformDisplay.setPositionRelative(djAudioPlayer->getPositionRelative());
+}
+

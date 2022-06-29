@@ -39,6 +39,8 @@ public:
 
     void stop();
 
+    double getPositionRelative() const;
+
 private:
     juce::AudioFormatManager &formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;

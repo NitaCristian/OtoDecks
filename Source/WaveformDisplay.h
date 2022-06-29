@@ -28,9 +28,12 @@ public:
 
     void changeListenerCallback(juce::ChangeBroadcaster *source) override;
 
+    void setPositionRelative(double pos);
+
 private:
     juce::AudioThumbnail audioThumbnail;
     bool fileLoaded;
+    double position;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveformDisplay)
 };
