@@ -23,6 +23,7 @@ MainComponent::~MainComponent() {
     shutdownAudio();
 }
 
+
 //==============================================================================
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
     player1.prepareToPlay(samplesPerBlockExpected, sampleRate);
