@@ -16,6 +16,7 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
                  juce::AudioThumbnailCache &cacheToUse) : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse)
 {
     addAndMakeVisible(playButton);
+    addAndMakeVisible(pauseButton);
     addAndMakeVisible(stopButton);
     addAndMakeVisible(loadButton);
 
@@ -26,8 +27,16 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     addAndMakeVisible(waveformDisplay);
 
     playButton.addListener(this);
+    playButton.setButtonText("Play");
+
+    pauseButton.addListener(this);
+    pauseButton.setButtonText("Pause");
+
     stopButton.addListener(this);
+    stopButton.setButtonText("Stop");
+
     loadButton.addListener(this);
+    loadButton.setButtonText("Load");
 
     gainSlider.addListener(this);
     gainSlider.setRange(0.0, 1.0);
@@ -55,16 +64,17 @@ void DeckGUI::paint(juce::Graphics &g)
 
 void DeckGUI::resized()
 {
-    auto rowHeight = getHeight() / 8;
+    auto rowHeight = getHeight() / 9;
     playButton.setBounds(0, 0, getWidth(), rowHeight);
-    stopButton.setBounds(0, rowHeight, getWidth(), rowHeight);
+    pauseButton.setBounds(0, rowHeight, getWidth(), rowHeight);
+    stopButton.setBounds(0, 2 * rowHeight, getWidth(), rowHeight);
+    loadButton.setBounds(0, 3 * rowHeight, getWidth(), rowHeight);
 
-    gainSlider.setBounds(0, 2 * rowHeight, getWidth(), rowHeight);
-    speedSlider.setBounds(0, 3 * rowHeight, getWidth(), rowHeight);
-    posSlider.setBounds(0, 4 * rowHeight, getWidth(), rowHeight);
+    gainSlider.setBounds(0, 4 * rowHeight, getWidth(), rowHeight);
+    speedSlider.setBounds(0, 5 * rowHeight, getWidth(), rowHeight);
+    posSlider.setBounds(0, 6 * rowHeight, getWidth(), rowHeight);
 
-    waveformDisplay.setBounds(0, 5 * rowHeight, getWidth(), rowHeight * 2);
-    loadButton.setBounds(0, 7 * rowHeight, getWidth(), rowHeight);
+    waveformDisplay.setBounds(0, 7 * rowHeight, getWidth(), rowHeight * 2);
 }
 
 void DeckGUI::buttonClicked(juce::Button *button)
@@ -73,9 +83,14 @@ void DeckGUI::buttonClicked(juce::Button *button)
     {
         djAudioPlayer->start();
     }
+    if (button == &pauseButton)
+    {
+        djAudioPlayer->stop();
+    }
     if (button == &stopButton)
     {
         djAudioPlayer->stop();
+        djAudioPlayer->setPosition(0);
     }
     if (button == &loadButton)
     {
@@ -114,8 +129,10 @@ void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y)
 {
     for (const auto &filename : files)
     {
-        juce::URL fileURL = juce::URL{juce::File{filename}};
-        djAudioPlayer->loadURL(fileURL);
+        auto audioURL = juce::URL{juce::File{filename}};
+        djAudioPlayer->loadURL(audioURL);
+        waveformDisplay.loadURL(audioURL);
+
         return;
     }
 }

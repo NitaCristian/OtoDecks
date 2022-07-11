@@ -16,44 +16,45 @@
 
 //==============================================================================
 /*
-*/
-class DeckGUI : public juce::Component, public juce::Button::Listener, public juce::Slider::Listener, public juce::Timer,
-                public juce::FileDragAndDropTarget {
+ */
+class DeckGUI : public juce::Component, public juce::Button::Listener, public juce::Slider::Listener, public juce::Timer, public juce::FileDragAndDropTarget
+{
 public:
-    DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse);
+  DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse);
 
-    ~DeckGUI() override;
+  ~DeckGUI() override;
 
-    void paint(juce::Graphics &) override;
+  void paint(juce::Graphics &) override;
 
-    void resized() override;
+  void resized() override;
 
-    // From Button::Listener
-    void buttonClicked(juce::Button *) override;
+  // From Button::Listener
+  void buttonClicked(juce::Button *) override;
 
-    // From Slider::Listener
-    void sliderValueChanged(juce::Slider *slider) override;
+  // From Slider::Listener
+  void sliderValueChanged(juce::Slider *slider) override;
 
-    // From FileDragAndDropTarget
-    bool isInterestedInFileDrag(const juce::StringArray &files) override;
+  // From FileDragAndDropTarget
+  bool isInterestedInFileDrag(const juce::StringArray &files) override;
 
-    void filesDropped(const juce::StringArray &files, int x, int y) override;
+  void filesDropped(const juce::StringArray &files, int x, int y) override;
 
-    // From Timer
-    void timerCallback() override;
+  // From Timer
+  void timerCallback() override;
 
 private:
-    juce::TextButton playButton{"PLAY"};
-    juce::TextButton stopButton{"STOP"};
-    juce::TextButton loadButton{"LOAD"};
+  juce::TextButton playButton;
+  juce::TextButton pauseButton;
+  juce::TextButton stopButton;
+  juce::TextButton loadButton;
 
-    juce::Slider gainSlider;
-    juce::Slider speedSlider;
-    juce::Slider posSlider;
+  juce::Slider gainSlider;
+  juce::Slider speedSlider;
+  juce::Slider posSlider;
 
-    WaveformDisplay waveformDisplay;
+  WaveformDisplay waveformDisplay;
 
-    DJAudioPlayer *djAudioPlayer;
+  DJAudioPlayer *djAudioPlayer;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeckGUI)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)
 };
