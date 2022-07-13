@@ -14,35 +14,37 @@
 //==============================================================================
 PlaylistComponent::PlaylistComponent()
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-    // trackTitles.emplace_back("Track 1");
-    // trackTitles.emplace_back("Track 2");
-    // trackTitles.emplace_back("Track 3");
-    // trackTitles.emplace_back("Track 4");
-    // trackTitles.emplace_back("Track 5");
-    // trackTitles.emplace_back("Track 6");
+    trackTitles.emplace_back("Track 1");
+    trackTitles.emplace_back("Track 2");
+    trackTitles.emplace_back("Track 3");
+    trackTitles.emplace_back("Track 4");
+    trackTitles.emplace_back("Track 5");
+    trackTitles.emplace_back("Track 6");
 
+    addAndMakeVisible(searchTrack);
+
+    addAndMakeVisible(tableComponent);
     tableComponent.getHeader().addColumn("No.", 1, 100);
     tableComponent.getHeader().addColumn("Title", 2, 100);
     tableComponent.getHeader().addColumn("Duration", 3, 100);
     tableComponent.getHeader().addColumn("Audio format", 4, 100);
-    tableComponent.getHeader().addColumn("Playlist", 5, 100);
-
+    // tableComponent.getHeader().addColumn("Playlist", 5, 100);
     tableComponent.setModel(this);
-
-    addAndMakeVisible(tableComponent);
+    tableComponent.setMultipleSelectionEnabled(true);
 
     addAndMakeVisible(addTrack);
-    addAndMakeVisible(removeTrack);
-    addAndMakeVisible(savePlaylist);
-    addAndMakeVisible(loadPlaylist);
-    addAndMakeVisible(clearPlaylist);
-
     addTrack.setButtonText("Add track");
+
+    addAndMakeVisible(removeTrack);
     removeTrack.setButtonText("Remove track");
+
+    addAndMakeVisible(savePlaylist);
     savePlaylist.setButtonText("Save playlist");
+
+    addAndMakeVisible(loadPlaylist);
     loadPlaylist.setButtonText("Load playlist");
+
+    addAndMakeVisible(clearPlaylist);
     clearPlaylist.setButtonText("Clear playlist");
 }
 
@@ -52,36 +54,25 @@ PlaylistComponent::~PlaylistComponent()
 
 void PlaylistComponent::paint(juce::Graphics &g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code...
-    */
-
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId)); // clear the background
-
-    g.setColour(juce::Colours::grey);
-    g.drawRect(getLocalBounds(), 1); // draw an outline around the component
-
-    g.setColour(juce::Colours::white);
-    g.setFont(14.0f);
-    g.drawText("PlaylistComponent", getLocalBounds(),
-               juce::Justification::centred, true); // draw some placeholder text
 }
 
 void PlaylistComponent::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-    auto buttonWidth = 100;
+    auto area = getLocalBounds();
+
+    auto buttonWidth = getWidth() / 8;
+    auto buttonsArea = area.removeFromLeft(buttonWidth);
+
     auto buttonHeight = getHeight() / 5;
-    tableComponent.setBounds(buttonWidth, 0, getWidth(), getHeight());
-    addTrack.setBounds(0, 0, buttonWidth, buttonHeight);
-    removeTrack.setBounds(0, buttonHeight, buttonWidth, buttonHeight);
-    savePlaylist.setBounds(0, 2 * buttonHeight, buttonWidth, buttonHeight);
-    loadPlaylist.setBounds(0, 3 * buttonHeight, buttonWidth, buttonHeight);
-    clearPlaylist.setBounds(0, 4 * buttonHeight, buttonWidth, buttonHeight);
+    addTrack.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    removeTrack.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    savePlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    loadPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    clearPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
+
+    searchTrack.setBounds(area.removeFromTop(50));
+    tableComponent.setBounds(area);
 }
 
 int PlaylistComponent::getNumRows()
@@ -100,7 +91,22 @@ void PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int
 
 void PlaylistComponent::paintCell(juce::Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
-    g.drawText(trackTitles[rowNumber], 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+    if (columnId == 1) // No.
+    {
+        g.drawText(JUCE_TO_STRING(rowNumber), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+    }
+    if (columnId == 2) // Title
+    {
+        g.drawText(trackTitles[rowNumber], 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+    }
+    if (columnId == 3) // Duration
+    {
+        g.drawText("1:56", 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+    }
+    if (columnId == 4) // Audio format
+    {
+        g.drawText(".idk", 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+    }
 }
 
 juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component *existingComponentToUpdate)
@@ -113,7 +119,6 @@ juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int c
         {
             auto *button = new juce::TextButton{"PLAY"};
             button->addListener(this);
-            //            juce::String id{std::to_string(rowNumber)};
             button->setComponentID(std::to_string(rowNumber));
             existingComponentToUpdate = button;
         }
@@ -123,5 +128,27 @@ juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int c
 
 void PlaylistComponent::buttonClicked(juce::Button *button)
 {
+    if (button == &addTrack)
+    {
+    }
     DBG(button->getComponentID());
+}
+
+bool PlaylistComponent::isInterestedInFileDrag(const juce::StringArray &files)
+{
+    return true;
+}
+
+void PlaylistComponent::filesDropped(const juce::StringArray &files, int x, int y)
+{
+    for (const auto &filename : files)
+    {
+        trackTitles.push_back(filename.toStdString());
+        auto audioURL = juce::URL{juce::File{filename}};
+        // TODO need loadURL
+        // Update loadURL with new method from DJPlayer
+        tableComponent.updateContent();
+        tableComponent.repaint();
+        return;
+    }
 }

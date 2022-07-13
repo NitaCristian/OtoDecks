@@ -49,8 +49,13 @@ private:
   juce::TextButton loadButton;
 
   juce::Slider gainSlider;
+  juce::Label gainLabel;
+
   juce::Slider speedSlider;
+  juce::Label speedLabel;
+
   juce::Slider posSlider;
+  juce::Label posLabel;
 
   WaveformDisplay waveformDisplay;
 

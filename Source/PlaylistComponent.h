@@ -15,7 +15,7 @@
 //==============================================================================
 /*
  */
-class PlaylistComponent : public juce::Component, public juce::TableListBoxModel, public juce::Button::Listener
+class PlaylistComponent : public juce::Component, public juce::TableListBoxModel, public juce::Button::Listener, public juce::FileDragAndDropTarget
 {
 public:
   PlaylistComponent();
@@ -35,13 +35,18 @@ public:
   juce::Component *refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
                                            Component *existingComponentToUpdate) override;
 
-  void buttonClicked(juce::Button *button) override;
+  // From Button::Listener
+  void buttonClicked(juce::Button *) override;
+
+  // From FileDragAndDropTarget
+  bool isInterestedInFileDrag(const juce::StringArray &files) override;
+
+  void filesDropped(const juce::StringArray &files, int x, int y) override;
 
 private:
   juce::TableListBox tableComponent;
   std::vector<std::string> trackTitles;
 
-  // Button listener
   juce::TextButton addTrack;
   juce::TextButton removeTrack;
   juce::TextButton savePlaylist;
@@ -50,8 +55,6 @@ private:
 
   // Search barb -> TextEditor needs listener
   juce::TextEditor searchTrack;
-
-  // File dropped event here to add tracks
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };
