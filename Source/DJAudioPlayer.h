@@ -42,11 +42,24 @@ public:
 
   double getPositionRelative() const;
 
+  void setBass(double frequency)
+  {
+    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(44100, frequency));
+  }
+
+  void setTreble(double frequency)
+  {
+    trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(44100, frequency));
+  }
+
 private:
   juce::AudioFormatManager &formatManager;
   std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
   juce::AudioTransportSource transportSource;
-  juce::ResamplingAudioSource resampleSource{&transportSource, false, 2};
+  juce::IIRFilterAudioSource bassFilterSource{&transportSource, false};
+  juce::IIRFilterAudioSource trebleFilterSource{&bassFilterSource, false};
+  juce::ResamplingAudioSource resampleSource{&trebleFilterSource, false, 2};
+  // juce::IIRFilterAudioSource midFilterSource{&bassFilterSource, false};
 };
 
 // void openButtonClicked()

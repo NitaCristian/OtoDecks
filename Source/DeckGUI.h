@@ -57,6 +57,12 @@ private:
   juce::Slider posSlider;
   juce::Label posLabel;
 
+  juce::Slider bassSlider;
+  juce::Label bassLabel;
+
+  juce::Slider trebleSlider;
+  juce::Label trebleLabel;
+
   WaveformDisplay waveformDisplay;
 
   DJAudioPlayer *djAudioPlayer;

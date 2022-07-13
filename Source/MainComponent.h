@@ -10,7 +10,8 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent : public juce::AudioAppComponent {
+class MainComponent : public juce::AudioAppComponent
+{
 public:
     //==============================================================================
     MainComponent();
@@ -30,7 +31,6 @@ public:
     void resized() override;
 
 private:
-
     juce::AudioFormatManager formatManager;
     juce::AudioThumbnailCache thumbnailCache{100};
 
@@ -44,5 +44,5 @@ private:
 
     PlaylistComponent playlistComponent;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

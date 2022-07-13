@@ -58,6 +58,26 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     posLabel.setText("Position", juce::dontSendNotification);
     posLabel.attachToComponent(&posSlider, true);
 
+    addAndMakeVisible(bassSlider);
+    bassSlider.addListener(this);
+    bassSlider.setRange(50.0, 20000.0);
+    bassSlider.setValue(500.0);
+    bassSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+
+    addAndMakeVisible(bassLabel);
+    bassLabel.setText("Bass", juce::dontSendNotification);
+    bassLabel.attachToComponent(&bassSlider, true);
+
+    addAndMakeVisible(trebleSlider);
+    trebleSlider.addListener(this);
+    trebleSlider.setRange(50.0, 20000.0);
+    trebleSlider.setValue(500.0);
+    trebleSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+
+    addAndMakeVisible(trebleLabel);
+    trebleLabel.setText("Treble", juce::dontSendNotification);
+    trebleLabel.attachToComponent(&trebleSlider, true);
+
     addAndMakeVisible(waveformDisplay);
 
     startTimer(500);
@@ -77,7 +97,7 @@ void DeckGUI::resized()
 {
     auto area = getLocalBounds();
 
-    auto rowHeight = getHeight() / 5;
+    auto rowHeight = getHeight() / 7;
 
     auto waveformArea = area.removeFromTop(rowHeight);
     waveformDisplay.setBounds(waveformArea);
@@ -89,10 +109,15 @@ void DeckGUI::resized()
     stopButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
     loadButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
 
-    auto padding = area.removeFromLeft(50);
-    gainSlider.setBounds(area.removeFromTop(rowHeight));
-    speedSlider.setBounds(area.removeFromTop(rowHeight));
-    posSlider.setBounds(area.removeFromTop(rowHeight));
+    auto sliderArea = area.removeFromTop(rowHeight * 3);
+    auto padding = sliderArea.removeFromLeft(50);
+    gainSlider.setBounds(sliderArea.removeFromTop(rowHeight));
+    speedSlider.setBounds(sliderArea.removeFromTop(rowHeight));
+    posSlider.setBounds(sliderArea.removeFromTop(rowHeight));
+
+    auto eqArea = area.removeFromTop(rowHeight * 2);
+    bassSlider.setBounds(eqArea.removeFromLeft(getWidth() / 2));
+    trebleSlider.setBounds(eqArea.removeFromLeft(getWidth() / 2));
 }
 
 void DeckGUI::buttonClicked(juce::Button *button)
@@ -135,6 +160,14 @@ void DeckGUI::sliderValueChanged(juce::Slider *slider)
     if (slider == &posSlider)
     {
         djAudioPlayer->setPositionRelative(slider->getValue());
+    }
+    if (slider == &bassSlider)
+    {
+        djAudioPlayer->setBass(slider->getValue());
+    }
+    if (slider == &trebleSlider)
+    {
+        djAudioPlayer->setTreble(slider->getValue());
     }
 }
 

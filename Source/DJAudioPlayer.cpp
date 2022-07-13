@@ -22,14 +22,25 @@ void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
     resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+
+    bassFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 500));
+
+    // midFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    // midFilterSource.setCoefficients(juce::IIRCoefficients::makeBandPass(sampleRate, 4000));
+
+    trebleFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 10000));
 }
 
 void DJAudioPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
 {
-    //    if (readerSource == nullptr) {
-    //        bufferToFill.clearActiveBufferRegion();
-    //        return;
-    //    }
+    if (readerSource == nullptr)
+    {
+        bufferToFill.clearActiveBufferRegion();
+        return;
+    }
+
     resampleSource.getNextAudioBlock(bufferToFill);
 }
 
@@ -37,6 +48,10 @@ void DJAudioPlayer::releaseResources()
 {
     transportSource.releaseResources();
     resampleSource.releaseResources();
+
+    bassFilterSource.releaseResources();
+    // midFilterSource.releaseResources();
+    trebleFilterSource.releaseResources();
 }
 
 void DJAudioPlayer::loadURL(const juce::URL &audioURL)
