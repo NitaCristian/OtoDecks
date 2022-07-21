@@ -1,0 +1,41 @@
+Play
+    Button
+Pause
+    Button
+Stop 
+    Button
+    
+Load on this deck
+    Button
+    Drag and drop from table
+    
+Speed
+    Slider
+Volume/Gain
+    Slider
+Position
+    Slider
+
+Waveform
+
+Playlist
+    Add track
+        Button
+        Drag and drop
+    Remove track
+        Button
+        Delete key
+    Save playlist
+        Button
+    Load playlist
+        Button
+    Clear playlist
+        Button
+    Search bar
+        Textbox
+    Table of tracks
+        No. 
+        Title
+        Duration
+        Audio Format*
+        Playlist*

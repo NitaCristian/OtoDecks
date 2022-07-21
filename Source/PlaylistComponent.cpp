@@ -32,20 +32,25 @@ PlaylistComponent::PlaylistComponent()
     tableComponent.setModel(this);
     tableComponent.setMultipleSelectionEnabled(true);
 
-    addAndMakeVisible(addTrack);
-    addTrack.setButtonText("Add track");
+    addAndMakeVisible(addTracks);
+    addTracks.setButtonText("Add tracks");
+    addTracks.addListener(this);
 
-    addAndMakeVisible(removeTrack);
-    removeTrack.setButtonText("Remove track");
+    addAndMakeVisible(removeTracks);
+    removeTracks.setButtonText("Remove tracks");
+    removeTracks.addListener(this);
 
     addAndMakeVisible(savePlaylist);
     savePlaylist.setButtonText("Save playlist");
+    savePlaylist.addListener(this);
 
     addAndMakeVisible(loadPlaylist);
     loadPlaylist.setButtonText("Load playlist");
+    loadPlaylist.addListener(this);
 
     addAndMakeVisible(clearPlaylist);
     clearPlaylist.setButtonText("Clear playlist");
+    clearPlaylist.addListener(this);
 }
 
 PlaylistComponent::~PlaylistComponent()
@@ -65,8 +70,8 @@ void PlaylistComponent::resized()
     auto buttonsArea = area.removeFromLeft(buttonWidth);
 
     auto buttonHeight = getHeight() / 5;
-    addTrack.setBounds(buttonsArea.removeFromTop(buttonHeight));
-    removeTrack.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    addTracks.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    removeTracks.setBounds(buttonsArea.removeFromTop(buttonHeight));
     savePlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
     loadPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
     clearPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
@@ -128,10 +133,52 @@ juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int c
 
 void PlaylistComponent::buttonClicked(juce::Button *button)
 {
-    if (button == &addTrack)
+    if (button == &addTracks)
     {
+        auto chooser = std::make_unique<juce::FileChooser>("Select a Wave file to play...", juce::File{}, "*.mp3");
+        auto chooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+
+        chooser->launchAsync(chooserFlags, [this](const juce::FileChooser &fc)
+                             {
+            auto file = fc.getResult();
+
+            if (file != juce::File{})
+            {
+                DBG(file.getFileName());
+            } });
+
+        tableComponent.updateContent();
+        tableComponent.repaint();
     }
-    DBG(button->getComponentID());
+    if (button == &removeTracks)
+    {
+        auto selectedRows = tableComponent.getSelectedRows();
+        for (size_t i = 0; i < tableComponent.getNumSelectedRows(); i++)
+        {
+            trackTitles.erase(trackTitles.begin() + selectedRows[i]);
+        }
+        tableComponent.updateContent();
+        tableComponent.repaint();
+    }
+    if (button == &savePlaylist)
+    {
+        // Write to file
+        // Save the file
+    }
+    if (button == &loadPlaylist)
+    {
+        // Load file
+        // Process info
+        // Add new Songs to trackTitles
+        tableComponent.updateContent();
+        tableComponent.repaint();
+    }
+    if (button == &clearPlaylist)
+    {
+        trackTitles.clear();
+        tableComponent.updateContent();
+        tableComponent.repaint();
+    }
 }
 
 bool PlaylistComponent::isInterestedInFileDrag(const juce::StringArray &files)

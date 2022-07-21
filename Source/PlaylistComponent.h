@@ -47,8 +47,8 @@ private:
   juce::TableListBox tableComponent;
   std::vector<std::string> trackTitles;
 
-  juce::TextButton addTrack;
-  juce::TextButton removeTrack;
+  juce::TextButton addTracks;
+  juce::TextButton removeTracks;
   juce::TextButton savePlaylist;
   juce::TextButton loadPlaylist;
   juce::TextButton clearPlaylist;
