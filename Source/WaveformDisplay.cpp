@@ -12,7 +12,8 @@
 #include "WaveformDisplay.h"
 
 //==============================================================================
-WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse) : audioThumbnail(1000, formatManagerToUse, cacheToUse), fileLoaded(false), position(0.0)
+WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *_djAudioPlayer)
+    : audioThumbnail(1000, formatManagerToUse, cacheToUse), fileLoaded(false), position(0.0), djAudioPlayer(_djAudioPlayer)
 {
     audioThumbnail.addChangeListener(this);
 }
@@ -37,10 +38,13 @@ void WaveformDisplay::paint(juce::Graphics &g)
         return;
     }
 
-    audioThumbnail.drawChannel(g, getLocalBounds(), 0, audioThumbnail.getTotalLength(), 0, 1);
+    auto area = getLocalBounds();
+    auto channelWaveform = getHeight() / 2;
+    audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveform), 0, audioThumbnail.getTotalLength(), 0, 1);
+    audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveform), 0, audioThumbnail.getTotalLength(), 1, 1);
 
     g.setColour(juce::Colours::lightgreen);
-    g.drawRect(position * getWidth(), 0, getWidth() / 20, getHeight());
+    g.drawRect(position * getWidth(), 0, getWidth() / 25, getHeight());
 }
 
 void WaveformDisplay::resized()

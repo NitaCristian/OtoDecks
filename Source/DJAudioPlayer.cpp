@@ -24,10 +24,10 @@ void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate
     resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
     bassFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 500));
+    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 20000.0));
 
     trebleFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 10000));
+    trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 50.0));
 }
 
 void DJAudioPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
@@ -75,9 +75,9 @@ void DJAudioPlayer::setGain(double gain)
 
 void DJAudioPlayer::setSpeed(double ratio)
 {
-    if (ratio <= 0.0 || ratio > 100.0)
+    if (ratio <= 0.0 || ratio > 5.0)
     {
-        std::cout << "Error: The ratio needs to be between 0.0 and 100.0.\n";
+        std::cout << "Error: The ratio needs to be between 0.0 and 5.0.\n";
         return;
     }
 

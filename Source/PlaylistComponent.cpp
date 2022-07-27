@@ -82,6 +82,7 @@ int PlaylistComponent::getNumRows()
 void PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected)
 {
     g.fillAll(juce::Colours::darkgrey);
+
     if (rowIsSelected)
     {
         g.fillAll(juce::Colours::orange);
@@ -113,18 +114,6 @@ void PlaylistComponent::paintCell(juce::Graphics &g, int rowNumber, int columnId
 juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component *existingComponentToUpdate)
 {
     return existingComponentToUpdate;
-
-    // if (columnId == 2)
-    // {
-    //     if (existingComponentToUpdate == nullptr)
-    //     {
-    //         auto *button = new juce::TextButton{"PLAY"};
-    //         button->addListener(this);
-    //         button->setComponentID(std::to_string(rowNumber));
-    //         existingComponentToUpdate = button;
-    //     }
-    // }
-    // return existingComponentToUpdate;
 }
 
 void PlaylistComponent::buttonClicked(juce::Button *button)
@@ -141,9 +130,6 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
                                  {
                                      Track newTrack(file);
                                      insertUniqueTrack(newTrack);
-
-                                     this->tableComponent.updateContent();
-                                     this->tableComponent.repaint();
                                  }
                              });
     }
@@ -155,8 +141,7 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
             tracks.erase(tracks.begin() + selectedRows[i]);
         }
 
-        tableComponent.updateContent();
-        tableComponent.repaint();
+        updateTable();
     }
     if (button == &savePlaylist)
     {
@@ -165,15 +150,13 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
     if (button == &loadPlaylist)
     {
         // TODO - Load Playlist
-        tableComponent.updateContent();
-        tableComponent.repaint();
+        updateTable();
     }
     if (button == &clearPlaylist)
     {
         tracks.clear();
 
-        tableComponent.updateContent();
-        tableComponent.repaint();
+        updateTable();
     }
 }
 
@@ -187,11 +170,6 @@ void PlaylistComponent::filesDropped(const juce::StringArray &files, int x, int 
     for (const auto &filename : files)
     {
         auto file = juce::File{filename};
-
-        Track newTrack(file);
-        insertUniqueTrack(newTrack);
-
-        tableComponent.updateContent();
-        tableComponent.repaint();
+        insertUniqueTrack(Track(file));
     }
 }

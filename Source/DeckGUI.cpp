@@ -13,7 +13,7 @@
 
 //==============================================================================
 DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
-    : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse), playlist(playlistComponent)
+    : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse, _player), playlist(playlistComponent)
 {
     addAndMakeVisible(playButton);
     playButton.addListener(this);
@@ -49,18 +49,10 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     speedLabel.setText("Speed", juce::dontSendNotification);
     speedLabel.attachToComponent(&speedSlider, true);
 
-    addAndMakeVisible(posSlider);
-    posSlider.addListener(this);
-    posSlider.setRange(0.0, 1.0);
-
-    addAndMakeVisible(posLabel);
-    posLabel.setText("Position", juce::dontSendNotification);
-    posLabel.attachToComponent(&posSlider, true);
-
     addAndMakeVisible(bassSlider);
     bassSlider.addListener(this);
     bassSlider.setRange(50.0, 20000.0);
-    bassSlider.setValue(500.0);
+    bassSlider.setValue(20000.0);
     bassSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 
     addAndMakeVisible(bassLabel);
@@ -69,7 +61,7 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     addAndMakeVisible(trebleSlider);
     trebleSlider.addListener(this);
     trebleSlider.setRange(50.0, 20000.0);
-    trebleSlider.setValue(4000.0);
+    trebleSlider.setValue(50.0);
     trebleSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 
     addAndMakeVisible(trebleLabel);
@@ -106,11 +98,10 @@ void DeckGUI::resized()
     stopButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
     loadButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
 
-    auto sliderArea = area.removeFromTop(rowHeight * 3);
+    auto sliderArea = area.removeFromTop(rowHeight * 2);
     auto padding = sliderArea.removeFromLeft(50);
     gainSlider.setBounds(sliderArea.removeFromTop(rowHeight));
     speedSlider.setBounds(sliderArea.removeFromTop(rowHeight));
-    posSlider.setBounds(sliderArea.removeFromTop(rowHeight));
 
     auto eqArea = area.removeFromTop(rowHeight * 2);
     bassSlider.setBounds(eqArea.removeFromLeft(getWidth() / 2));
@@ -134,22 +125,14 @@ void DeckGUI::buttonClicked(juce::Button *button)
     }
     if (button == &loadButton)
     {
-        int firstSelectedSong = playlist->selectrows[0];
-        auto track = playlist->tracks[firstSelectedSong];
-        auto audioURL = track.audioURL;
-        this->djAudioPlayer->loadURL(audioURL);
-        this->waveformDisplay.loadURL(audioURL);
-
-        return;
-        // auto fileChooserFlags = juce::FileBrowserComponent::canSelectFiles;
-        // fChooser.launchAsync(fileChooserFlags,
-        //                      [this](const juce::FileChooser &chooser)
-        //                      {
-        //                          juce::File chosenFile = chooser.getResult();
-        //                          auto audioURL = juce::URL(chosenFile);
-        //                          this->djAudioPlayer->loadURL(audioURL);
-        //                          this->waveformDisplay.loadURL(audioURL);
-        //                      });
+        int firstSelectedSong = playlist->getFirstSelectedRow();
+        if (firstSelectedSong != -1)
+        {
+            auto track = playlist->tracks[firstSelectedSong];
+            auto audioURL = track.audioURL;
+            this->djAudioPlayer->loadURL(audioURL);
+            this->waveformDisplay.loadURL(audioURL);
+        }
     }
 }
 
@@ -162,10 +145,6 @@ void DeckGUI::sliderValueChanged(juce::Slider *slider)
     if (slider == &speedSlider)
     {
         djAudioPlayer->setSpeed(slider->getValue());
-    }
-    if (slider == &posSlider)
-    {
-        djAudioPlayer->setPositionRelative(slider->getValue());
     }
     if (slider == &bassSlider)
     {
@@ -186,9 +165,11 @@ void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y)
 {
     for (const auto &filename : files)
     {
-        auto audioURL = juce::URL{juce::File{filename}};
+        auto file = juce::File{filename};
+        auto audioURL = juce::URL{file};
         djAudioPlayer->loadURL(audioURL);
         waveformDisplay.loadURL(audioURL);
+        playlist->insertUniqueTrack(Track(file));
         return;
     }
 }

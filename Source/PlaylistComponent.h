@@ -29,7 +29,7 @@ struct Track
 
   double getDurationInSeconds(const juce::File &audioFile)
   {
-    juce::AudioFormatManager formatManager; // TODO make global
+    juce::AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
 
     if (auto reader = formatManager.createReaderFor(audioFile))
@@ -38,10 +38,6 @@ struct Track
       delete reader;
       return lengthInSeconds;
     }
-
-    // if (auto *reader = audioFormatReaderSource->getAudioFormatReader())
-    // double lengthInSeconds = static_cast<double>(audioFormatReaderSource->getTotalLength()) / reader->sampleRate;
-
     return -1;
   }
 };
@@ -66,8 +62,7 @@ public:
 
   void paintCell(juce::Graphics &, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
 
-  juce::Component *refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
-                                           Component *existingComponentToUpdate) override;
+  juce::Component *refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component *existingComponentToUpdate) override;
 
   // From Button::Listener
   void buttonClicked(juce::Button *) override;
@@ -87,18 +82,31 @@ public:
       }
     }
     tracks.push_back(newTrack);
+    updateTable();
   }
 
   void selectedRowsChanged(int row)
   {
-    if (row == -1)
-      return;
-    juce::SparseSet<int> selectedRows = tableComponent.getSelectedRows();
-    selectrows = selectedRows;
+    selectedRows = tableComponent.getSelectedRows();
+  }
+
+  int getFirstSelectedRow()
+  {
+    if (selectedRows.size() > 0)
+    {
+      return selectedRows[0];
+    }
+    return -1;
+  }
+
+  void updateTable()
+  {
+    tableComponent.updateContent();
+    tableComponent.repaint();
   }
 
   std::vector<Track> tracks;
-  juce::SparseSet<int> selectrows;
+  juce::SparseSet<int> selectedRows;
 
 private:
   juce::TableListBox tableComponent;

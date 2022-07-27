@@ -57,18 +57,15 @@ private:
   juce::Slider speedSlider;
   juce::Label speedLabel;
 
-  juce::Slider posSlider;
-  juce::Label posLabel;
-
   juce::Slider bassSlider;
   juce::Label bassLabel;
 
   juce::Slider trebleSlider;
   juce::Label trebleLabel;
 
-  WaveformDisplay waveformDisplay;
-
   DJAudioPlayer *djAudioPlayer;
+
+  WaveformDisplay waveformDisplay; // Take the djautioplayer
 
   juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};
 
