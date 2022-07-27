@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "DJAudioPlayer.h"
 #include "WaveformDisplay.h"
+#include "PlaylistComponent.h"
 
 //==============================================================================
 /*
@@ -20,7 +21,7 @@
 class DeckGUI : public juce::Component, public juce::Button::Listener, public juce::Slider::Listener, public juce::Timer, public juce::FileDragAndDropTarget
 {
 public:
-  DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse);
+  DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent);
 
   ~DeckGUI() override;
 
@@ -43,6 +44,8 @@ public:
   void timerCallback() override;
 
 private:
+  PlaylistComponent *playlist;
+
   juce::TextButton playButton;
   juce::TextButton pauseButton;
   juce::TextButton stopButton;

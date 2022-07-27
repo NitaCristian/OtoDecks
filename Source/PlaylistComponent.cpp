@@ -140,7 +140,6 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
                                  for (const auto &file : chosenFiles)
                                  {
                                      Track newTrack(file);
-                                     //  tracks.push_back(newTrack);
                                      insertUniqueTrack(newTrack);
 
                                      this->tableComponent.updateContent();
@@ -190,7 +189,6 @@ void PlaylistComponent::filesDropped(const juce::StringArray &files, int x, int 
         auto file = juce::File{filename};
 
         Track newTrack(file);
-        // tracks.push_back(newTrack);
         insertUniqueTrack(newTrack);
 
         tableComponent.updateContent();

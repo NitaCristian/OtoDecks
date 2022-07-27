@@ -12,8 +12,8 @@
 #include "DeckGUI.h"
 
 //==============================================================================
-DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse,
-                 juce::AudioThumbnailCache &cacheToUse) : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse)
+DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
+    : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse), playlist(playlistComponent)
 {
     addAndMakeVisible(playButton);
     playButton.addListener(this);
@@ -134,16 +134,22 @@ void DeckGUI::buttonClicked(juce::Button *button)
     }
     if (button == &loadButton)
     {
-        auto fileChooserFlags = juce::FileBrowserComponent::canSelectFiles;
+        int firstSelectedSong = playlist->selectrows[0];
+        auto track = playlist->tracks[firstSelectedSong];
+        auto audioURL = track.audioURL;
+        this->djAudioPlayer->loadURL(audioURL);
+        this->waveformDisplay.loadURL(audioURL);
 
-        fChooser.launchAsync(fileChooserFlags,
-                             [this](const juce::FileChooser &chooser)
-                             {
-                                 juce::File chosenFile = chooser.getResult();
-                                 auto audioURL = juce::URL(chosenFile);
-                                 this->djAudioPlayer->loadURL(audioURL);
-                                 this->waveformDisplay.loadURL(audioURL);
-                             });
+        return;
+        // auto fileChooserFlags = juce::FileBrowserComponent::canSelectFiles;
+        // fChooser.launchAsync(fileChooserFlags,
+        //                      [this](const juce::FileChooser &chooser)
+        //                      {
+        //                          juce::File chosenFile = chooser.getResult();
+        //                          auto audioURL = juce::URL(chosenFile);
+        //                          this->djAudioPlayer->loadURL(audioURL);
+        //                          this->waveformDisplay.loadURL(audioURL);
+        //                      });
     }
 }
 

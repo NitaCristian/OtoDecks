@@ -89,9 +89,19 @@ public:
     tracks.push_back(newTrack);
   }
 
+  void selectedRowsChanged(int row)
+  {
+    if (row == -1)
+      return;
+    juce::SparseSet<int> selectedRows = tableComponent.getSelectedRows();
+    selectrows = selectedRows;
+  }
+
+  std::vector<Track> tracks;
+  juce::SparseSet<int> selectrows;
+
 private:
   juce::TableListBox tableComponent;
-  std::vector<Track> tracks;
 
   juce::TextButton addTracks;
   juce::TextButton removeTracks;
