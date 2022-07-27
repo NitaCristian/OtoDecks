@@ -56,34 +56,8 @@ private:
   juce::AudioFormatManager &formatManager;
   std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
   juce::AudioTransportSource transportSource;
+
   juce::IIRFilterAudioSource bassFilterSource{&transportSource, false};
   juce::IIRFilterAudioSource trebleFilterSource{&bassFilterSource, false};
   juce::ResamplingAudioSource resampleSource{&trebleFilterSource, false, 2};
-  // juce::IIRFilterAudioSource midFilterSource{&bassFilterSource, false};
 };
-
-// void openButtonClicked()
-// {
-//   chooser = std::make_unique<juce::FileChooser>("Select a Wave file to play...",
-//                                                 juce::File{},
-//                                                 "*.wav");
-//   auto chooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
-
-//   chooser->launchAsync(chooserFlags, [this](const FileChooser &fc)
-//                        {
-//             auto file = fc.getResult();
-
-//             if (file != File{})
-//             {
-//                 auto* reader = formatManager.createReaderFor (file);
-
-//                 if (reader != nullptr)
-//                 {
-//                     auto newSource = std::make_unique<juce::AudioFormatReaderSource> (reader, true);
-//                     transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);
-//                     playButton.setEnabled (true);
-//                     thumbnail.setSource (new juce::FileInputSource (file));                            // [7]
-//                     readerSource.reset (newSource.release());
-//                 }
-//             } });
-// }

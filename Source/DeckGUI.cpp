@@ -39,7 +39,6 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     addAndMakeVisible(gainLabel);
     gainLabel.setText("Gain", juce::dontSendNotification);
     gainLabel.attachToComponent(&gainSlider, true);
-    // frequencySlider.setTextValueSuffix(" Hz");
 
     addAndMakeVisible(speedSlider);
     speedSlider.addListener(this);
@@ -62,21 +61,19 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     bassSlider.addListener(this);
     bassSlider.setRange(50.0, 20000.0);
     bassSlider.setValue(500.0);
-    bassSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+    bassSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 
     addAndMakeVisible(bassLabel);
     bassLabel.setText("Bass", juce::dontSendNotification);
-    bassLabel.attachToComponent(&bassSlider, true);
 
     addAndMakeVisible(trebleSlider);
     trebleSlider.addListener(this);
     trebleSlider.setRange(50.0, 20000.0);
-    trebleSlider.setValue(500.0);
+    trebleSlider.setValue(4000.0);
     trebleSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
 
     addAndMakeVisible(trebleLabel);
     trebleLabel.setText("Treble", juce::dontSendNotification);
-    trebleLabel.attachToComponent(&trebleSlider, true);
 
     addAndMakeVisible(waveformDisplay);
 
@@ -137,13 +134,16 @@ void DeckGUI::buttonClicked(juce::Button *button)
     }
     if (button == &loadButton)
     {
-        juce::FileChooser chooser("Select file");
-        if (chooser.browseForFileToOpen())
-        {
-            auto audioURL = juce::URL{chooser.getResult()};
-            djAudioPlayer->loadURL(audioURL);
-            waveformDisplay.loadURL(audioURL);
-        }
+        auto fileChooserFlags = juce::FileBrowserComponent::canSelectFiles;
+
+        fChooser.launchAsync(fileChooserFlags,
+                             [this](const juce::FileChooser &chooser)
+                             {
+                                 juce::File chosenFile = chooser.getResult();
+                                 auto audioURL = juce::URL(chosenFile);
+                                 this->djAudioPlayer->loadURL(audioURL);
+                                 this->waveformDisplay.loadURL(audioURL);
+                             });
     }
 }
 
@@ -183,8 +183,6 @@ void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y)
         auto audioURL = juce::URL{juce::File{filename}};
         djAudioPlayer->loadURL(audioURL);
         waveformDisplay.loadURL(audioURL);
-        // Load only 1 file dropped then return
-        // and do not process the rest of the files
         return;
     }
 }

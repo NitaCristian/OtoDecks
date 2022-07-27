@@ -26,9 +26,6 @@ void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate
     bassFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
     bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 500));
 
-    // midFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    // midFilterSource.setCoefficients(juce::IIRCoefficients::makeBandPass(sampleRate, 4000));
-
     trebleFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
     trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 10000));
 }
@@ -47,23 +44,21 @@ void DJAudioPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo &buffer
 void DJAudioPlayer::releaseResources()
 {
     transportSource.releaseResources();
-    resampleSource.releaseResources();
-
     bassFilterSource.releaseResources();
-    // midFilterSource.releaseResources();
     trebleFilterSource.releaseResources();
+    resampleSource.releaseResources();
 }
 
 void DJAudioPlayer::loadURL(const juce::URL &audioURL)
 {
-    auto *reader = formatManager.createReaderFor(
-        audioURL.createInputStream(juce::URL::InputStreamOptions{juce::URL::ParameterHandling::inAddress}));
+    auto *reader = formatManager.createReaderFor(audioURL.createInputStream(juce::URL::InputStreamOptions{juce::URL::ParameterHandling::inAddress}));
+
     if (reader == nullptr)
     {
-        std::cout << "Error: The formatManager could not create a reader for the file.\n";
+        return;
     }
 
-    std::unique_ptr<juce::AudioFormatReaderSource> newSource(new juce::AudioFormatReaderSource(reader, true));
+    auto newSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
     readerSource.reset(newSource.release());
 }

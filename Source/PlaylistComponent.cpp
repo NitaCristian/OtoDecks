@@ -14,13 +14,7 @@
 //==============================================================================
 PlaylistComponent::PlaylistComponent()
 {
-    trackTitles.emplace_back("Track 1");
-    trackTitles.emplace_back("Track 2");
-    trackTitles.emplace_back("Track 3");
-    trackTitles.emplace_back("Track 4");
-    trackTitles.emplace_back("Track 5");
-    trackTitles.emplace_back("Track 6");
-
+    // TODO - Implement search feature
     addAndMakeVisible(searchTrack);
 
     addAndMakeVisible(tableComponent);
@@ -82,7 +76,7 @@ void PlaylistComponent::resized()
 
 int PlaylistComponent::getNumRows()
 {
-    return trackTitles.size();
+    return tracks.size();
 }
 
 void PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected)
@@ -96,21 +90,23 @@ void PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int
 
 void PlaylistComponent::paintCell(juce::Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
+    auto track = tracks[rowNumber];
+
     if (columnId == 1) // No.
     {
-        g.drawText(JUCE_TO_STRING(rowNumber), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+        g.drawText(std::to_string(rowNumber + 1), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
     }
     if (columnId == 2) // Title
     {
-        g.drawText(trackTitles[rowNumber], 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+        g.drawText(track.title, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
     }
     if (columnId == 3) // Duration
     {
-        g.drawText("1:56", 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+        g.drawText(std::to_string(track.duration), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
     }
     if (columnId == 4) // Audio format
     {
-        g.drawText(".idk", 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+        g.drawText(track.format, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
     }
 }
 
@@ -118,64 +114,65 @@ juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int c
 {
     return existingComponentToUpdate;
 
-    if (columnId == 2)
-    {
-        if (existingComponentToUpdate == nullptr)
-        {
-            auto *button = new juce::TextButton{"PLAY"};
-            button->addListener(this);
-            button->setComponentID(std::to_string(rowNumber));
-            existingComponentToUpdate = button;
-        }
-    }
-    return existingComponentToUpdate;
+    // if (columnId == 2)
+    // {
+    //     if (existingComponentToUpdate == nullptr)
+    //     {
+    //         auto *button = new juce::TextButton{"PLAY"};
+    //         button->addListener(this);
+    //         button->setComponentID(std::to_string(rowNumber));
+    //         existingComponentToUpdate = button;
+    //     }
+    // }
+    // return existingComponentToUpdate;
 }
 
 void PlaylistComponent::buttonClicked(juce::Button *button)
 {
     if (button == &addTracks)
     {
-        auto chooser = std::make_unique<juce::FileChooser>("Select a Wave file to play...", juce::File{}, "*.mp3");
-        auto chooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+        auto fileChooserFlags = juce::FileBrowserComponent::canSelectMultipleItems;
 
-        chooser->launchAsync(chooserFlags, [this](const juce::FileChooser &fc)
+        fChooser.launchAsync(fileChooserFlags,
+                             [this](const juce::FileChooser &chooser)
                              {
-            auto file = fc.getResult();
+                                 juce::Array<juce::File> chosenFiles = chooser.getResults();
+                                 for (const auto &file : chosenFiles)
+                                 {
+                                     Track newTrack(file);
+                                     //  tracks.push_back(newTrack);
+                                     insertUniqueTrack(newTrack);
 
-            if (file != juce::File{})
-            {
-                DBG(file.getFileName());
-            } });
-
-        tableComponent.updateContent();
-        tableComponent.repaint();
+                                     this->tableComponent.updateContent();
+                                     this->tableComponent.repaint();
+                                 }
+                             });
     }
     if (button == &removeTracks)
     {
         auto selectedRows = tableComponent.getSelectedRows();
-        for (size_t i = 0; i < tableComponent.getNumSelectedRows(); i++)
+        for (auto i = 0; i < selectedRows.size(); i++)
         {
-            trackTitles.erase(trackTitles.begin() + selectedRows[i]);
+            tracks.erase(tracks.begin() + selectedRows[i]);
         }
+
         tableComponent.updateContent();
         tableComponent.repaint();
     }
     if (button == &savePlaylist)
     {
-        // Write to file
-        // Save the file
+        // TODO - Save Playlist
     }
     if (button == &loadPlaylist)
     {
-        // Load file
-        // Process info
-        // Add new Songs to trackTitles
+        // TODO - Load Playlist
         tableComponent.updateContent();
         tableComponent.repaint();
     }
     if (button == &clearPlaylist)
     {
-        trackTitles.clear();
+        tracks.clear();
+
         tableComponent.updateContent();
         tableComponent.repaint();
     }
@@ -190,12 +187,13 @@ void PlaylistComponent::filesDropped(const juce::StringArray &files, int x, int 
 {
     for (const auto &filename : files)
     {
-        trackTitles.push_back(filename.toStdString());
-        auto audioURL = juce::URL{juce::File{filename}};
-        // TODO need loadURL
-        // Update loadURL with new method from DJPlayer
+        auto file = juce::File{filename};
+
+        Track newTrack(file);
+        // tracks.push_back(newTrack);
+        insertUniqueTrack(newTrack);
+
         tableComponent.updateContent();
         tableComponent.repaint();
-        return;
     }
 }

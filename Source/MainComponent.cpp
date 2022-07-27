@@ -31,12 +31,12 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
-    player1.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    player2.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    // player1.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    // player2.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
-    mixerSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
     mixerSource.addInputSource(&player1, false);
     mixerSource.addInputSource(&player2, false);
+    mixerSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
@@ -46,9 +46,9 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo &buffer
 
 void MainComponent::releaseResources()
 {
-    player1.releaseResources();
-    player2.releaseResources();
     mixerSource.releaseResources();
+    // player1.releaseResources();
+    // player2.releaseResources();
 }
 
 //==============================================================================
@@ -59,7 +59,9 @@ void MainComponent::paint(juce::Graphics &g)
 
 void MainComponent::resized()
 {
-    deckGUI1.setBounds(0, 0, getWidth() / 2, getHeight() / 2);
-    deckGUI2.setBounds(getWidth() / 2, 0, getWidth() / 2, getHeight() / 2);
-    playlistComponent.setBounds(0, getHeight() / 2, getWidth(), getHeight() / 2);
+    auto area = getLocalBounds();
+    auto deckArea = area.removeFromTop(getHeight() / 2);
+    deckGUI1.setBounds(deckArea.removeFromLeft(getWidth() / 2));
+    deckGUI2.setBounds(deckArea.removeFromLeft(getWidth() / 2));
+    playlistComponent.setBounds(area);
 }

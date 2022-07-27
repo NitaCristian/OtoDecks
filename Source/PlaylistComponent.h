@@ -12,6 +12,40 @@
 
 #include <JuceHeader.h>
 
+struct Track
+{
+  juce::String title;
+  juce::String format;
+  double duration;
+  juce::URL audioURL;
+
+  Track(const juce::File &audioFile)
+  {
+    title = audioFile.getFileNameWithoutExtension();
+    format = audioFile.getFileExtension();
+    audioURL = juce::URL{audioFile};
+    duration = getDurationInSeconds(audioFile);
+  }
+
+  double getDurationInSeconds(const juce::File &audioFile)
+  {
+    juce::AudioFormatManager formatManager; // TODO make global
+    formatManager.registerBasicFormats();
+
+    if (auto reader = formatManager.createReaderFor(audioFile))
+    {
+      auto lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
+      delete reader;
+      return lengthInSeconds;
+    }
+
+    // if (auto *reader = audioFormatReaderSource->getAudioFormatReader())
+    // double lengthInSeconds = static_cast<double>(audioFormatReaderSource->getTotalLength()) / reader->sampleRate;
+
+    return -1;
+  }
+};
+
 //==============================================================================
 /*
  */
@@ -43,9 +77,21 @@ public:
 
   void filesDropped(const juce::StringArray &files, int x, int y) override;
 
+  void insertUniqueTrack(const Track &newTrack)
+  {
+    for (const auto &track : tracks)
+    {
+      if (newTrack.audioURL == track.audioURL)
+      {
+        return;
+      }
+    }
+    tracks.push_back(newTrack);
+  }
+
 private:
   juce::TableListBox tableComponent;
-  std::vector<std::string> trackTitles;
+  std::vector<Track> tracks;
 
   juce::TextButton addTracks;
   juce::TextButton removeTracks;
@@ -53,8 +99,10 @@ private:
   juce::TextButton loadPlaylist;
   juce::TextButton clearPlaylist;
 
-  // Search barb -> TextEditor needs listener
+  // TODO - Search bar -> TextEditor needs listener
   juce::TextEditor searchTrack;
+
+  juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

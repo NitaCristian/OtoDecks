@@ -67,5 +67,7 @@ private:
 
   DJAudioPlayer *djAudioPlayer;
 
+  juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)
 };
