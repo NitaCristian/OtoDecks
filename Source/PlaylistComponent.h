@@ -135,7 +135,7 @@ private:
 
   juce::TextEditor searchTrack;
 
-  juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};
+  juce::FileChooser fChooser{"Name of dialog", juce::File::getSpecialLocation(juce::File::userMusicDirectory)};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

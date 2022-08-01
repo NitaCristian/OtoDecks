@@ -138,7 +138,6 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
     if (button == &addTracks)
     {
         auto fileChooserFlags = juce::FileBrowserComponent::canSelectMultipleItems;
-
         fChooser.launchAsync(fileChooserFlags,
                              [this](const juce::FileChooser &chooser)
                              {
@@ -161,11 +160,32 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
     }
     if (button == &savePlaylist)
     {
-        // TODO - Save Playlist
+        auto fileChooserFlags = juce::FileBrowserComponent::saveMode;
+        fChooser.launchAsync(fileChooserFlags,
+                             [this](const juce::FileChooser &chooser)
+                             {
+                                 auto newFile = chooser.getResult();
+                                 for (const auto &track : tracks)
+                                 {
+                                     newFile.appendText(track.audioURL.getLocalFile().getFullPathName() + '\n');
+                                 }
+                                 newFile.create();
+                             });
     }
     if (button == &loadPlaylist)
     {
-        // TODO - Load Playlist
+        auto fileChooserFlags = juce::FileBrowserComponent::canSelectFiles;
+        fChooser.launchAsync(fileChooserFlags,
+                             [this](const juce::FileChooser &chooser)
+                             {
+                                 auto file = chooser.getResult();
+                                 juce::StringArray lines;
+                                 file.readLines(lines);
+                                 for (const auto &line : lines)
+                                 {
+                                     insertUniqueTrack(Track(juce::File(line)));
+                                 }
+                             });
         updateTable();
     }
     if (button == &clearPlaylist)
