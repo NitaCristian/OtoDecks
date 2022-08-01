@@ -45,7 +45,7 @@ struct Track
 //==============================================================================
 /*
  */
-class PlaylistComponent : public juce::Component, public juce::TableListBoxModel, public juce::Button::Listener, public juce::FileDragAndDropTarget
+class PlaylistComponent : public juce::Component, public juce::TableListBoxModel, public juce::Button::Listener, public juce::FileDragAndDropTarget, public juce::TextEditor::Listener
 {
 public:
   PlaylistComponent();
@@ -82,6 +82,7 @@ public:
       }
     }
     tracks.push_back(newTrack);
+    textEditorTextChanged(searchTrack);
     updateTable();
   }
 
@@ -105,7 +106,22 @@ public:
     tableComponent.repaint();
   }
 
+  void textEditorTextChanged(juce::TextEditor &textEditor)
+  {
+    filteredTracks.clear();
+    auto text = textEditor.getText();
+    for (const auto &track : tracks)
+    {
+      if (track.title.containsIgnoreCase(text))
+      {
+        filteredTracks.push_back(track);
+      }
+    }
+    updateTable();
+  }
+
   std::vector<Track> tracks;
+  std::vector<Track> filteredTracks;
   juce::SparseSet<int> selectedRows;
 
 private:
@@ -117,7 +133,6 @@ private:
   juce::TextButton loadPlaylist;
   juce::TextButton clearPlaylist;
 
-  // TODO - Search bar -> TextEditor needs listener
   juce::TextEditor searchTrack;
 
   juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};

@@ -14,15 +14,14 @@
 //==============================================================================
 PlaylistComponent::PlaylistComponent()
 {
-    // TODO - Implement search feature
     addAndMakeVisible(searchTrack);
+    searchTrack.addListener(this);
 
     addAndMakeVisible(tableComponent);
     tableComponent.getHeader().addColumn("No.", 1, 100);
     tableComponent.getHeader().addColumn("Title", 2, 100);
     tableComponent.getHeader().addColumn("Duration", 3, 100);
     tableComponent.getHeader().addColumn("Audio format", 4, 100);
-    // tableComponent.getHeader().addColumn("Playlist", 5, 100);
     tableComponent.setModel(this);
     tableComponent.setMultipleSelectionEnabled(true);
 
@@ -76,7 +75,7 @@ void PlaylistComponent::resized()
 
 int PlaylistComponent::getNumRows()
 {
-    return tracks.size();
+    return filteredTracks.size();
 }
 
 void PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected)
@@ -91,7 +90,8 @@ void PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int
 
 void PlaylistComponent::paintCell(juce::Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
-    auto track = tracks[rowNumber];
+    auto track = filteredTracks[rowNumber];
+    auto duration = floor(track.duration / 60 * 100) / 100;
 
     if (columnId == 1) // No.
     {
@@ -103,7 +103,7 @@ void PlaylistComponent::paintCell(juce::Graphics &g, int rowNumber, int columnId
     }
     if (columnId == 3) // Duration
     {
-        g.drawText(std::to_string(track.duration), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+        g.drawText(std::to_string(duration).substr(0, 4), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
     }
     if (columnId == 4) // Audio format
     {
@@ -155,7 +155,6 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
     if (button == &clearPlaylist)
     {
         tracks.clear();
-
         updateTable();
     }
 }
