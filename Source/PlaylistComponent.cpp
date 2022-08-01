@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PlaylistComponent.h"
+#include <fstream>
 
 //==============================================================================
 PlaylistComponent::PlaylistComponent()
@@ -44,10 +45,26 @@ PlaylistComponent::PlaylistComponent()
     addAndMakeVisible(clearPlaylist);
     clearPlaylist.setButtonText("Clear playlist");
     clearPlaylist.addListener(this);
+
+    std::ifstream fin("OtoDecks.state");
+    if (!fin.is_open())
+        return;
+    std::string filePath;
+    while (fin >> filePath)
+    {
+        insertUniqueTrack(Track(juce::File(filePath)));
+    }
+    fin.close();
 }
 
 PlaylistComponent::~PlaylistComponent()
 {
+    std::ofstream fout("OtoDecks.state");
+    for (const auto &track : tracks)
+    {
+        fout << track.audioURL.getLocalFile().getFullPathName() << '\n';
+    }
+    fout.close();
 }
 
 void PlaylistComponent::paint(juce::Graphics &g)
@@ -140,7 +157,6 @@ void PlaylistComponent::buttonClicked(juce::Button *button)
         {
             tracks.erase(tracks.begin() + selectedRows[i]);
         }
-
         updateTable();
     }
     if (button == &savePlaylist)
