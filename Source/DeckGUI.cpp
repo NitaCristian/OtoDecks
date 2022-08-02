@@ -67,6 +67,9 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     addAndMakeVisible(trebleLabel);
     trebleLabel.setText("Treble", juce::dontSendNotification);
 
+    addAndMakeVisible(trackName);
+    trackName.setFont(juce::Font(32.0f));
+
     addAndMakeVisible(waveformDisplay);
 
     startTimer(500);
@@ -86,7 +89,10 @@ void DeckGUI::resized()
 {
     auto area = getLocalBounds();
 
-    auto rowHeight = getHeight() / 7;
+    auto rowHeight = getHeight() / 8;
+
+    auto trackNameArea = area.removeFromTop(rowHeight);
+    trackName.setBounds(trackNameArea);
 
     auto waveformArea = area.removeFromTop(rowHeight);
     waveformDisplay.setBounds(waveformArea);
@@ -132,6 +138,7 @@ void DeckGUI::buttonClicked(juce::Button *button)
             auto audioURL = track.audioURL;
             this->djAudioPlayer->loadURL(audioURL);
             this->waveformDisplay.loadURL(audioURL);
+            this->trackName.setText(track.title, juce::dontSendNotification);
         }
     }
 }

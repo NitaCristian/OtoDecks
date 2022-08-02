@@ -65,6 +65,7 @@ private:
 
   DJAudioPlayer *djAudioPlayer;
 
+  juce::Label trackName;
   WaveformDisplay waveformDisplay; // Take the djautioplayer
 
   juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};
