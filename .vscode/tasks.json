@@ -70,6 +70,15 @@
                     "message": 5
                 }
             }
+        },
+        {
+            "label": "JUCE build & run",
+            "type": "shell",
+            "dependsOn": [
+                "JUCE makebuild",
+                "JUCE run"
+            ],
+            "problemMatcher": []
         }
     ]
 }

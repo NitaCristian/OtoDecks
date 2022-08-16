@@ -5,6 +5,9 @@
               defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;JUCE_USE_MP3AUDIOFORMAT=1">
   <MAINGROUP id="fYVq2I" name="OtoDecks">
     <GROUP id="{2FEA71EE-D8BD-8564-74DD-DF371D3B4EF1}" name="Source">
+      <FILE id="eoGDtW" name="MyLookAndFeel.cpp" compile="1" resource="0"
+            file="Source/MyLookAndFeel.cpp"/>
+      <FILE id="HNOzXD" name="MyLookAndFeel.h" compile="0" resource="0" file="Source/MyLookAndFeel.h"/>
       <FILE id="e1yEgj" name="PlaylistComponent.cpp" compile="1" resource="0"
             file="Source/PlaylistComponent.cpp"/>
       <FILE id="NchxB4" name="PlaylistComponent.h" compile="0" resource="0"

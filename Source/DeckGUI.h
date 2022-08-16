@@ -1,12 +1,4 @@
-/*
-  ==============================================================================
 
-    DeckGUI.h
-    Created: 28 Jun 2022 1:55:53pm
-    Author:  cristi
-
-  ==============================================================================
-*/
 
 #pragma once
 
@@ -14,6 +6,7 @@
 #include "DJAudioPlayer.h"
 #include "WaveformDisplay.h"
 #include "PlaylistComponent.h"
+#include "MyLookAndFeel.h"
 
 //==============================================================================
 /*
@@ -69,6 +62,7 @@ private:
   WaveformDisplay waveformDisplay; // Take the djautioplayer
 
   juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory), "*.mp3"};
+  MyLookAndFeel customLookAndFeel;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)
 };

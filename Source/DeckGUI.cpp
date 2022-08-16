@@ -15,6 +15,8 @@
 DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
     : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse, _player), playlist(playlistComponent)
 {
+    setLookAndFeel(&customLookAndFeel);
+
     addAndMakeVisible(playButton);
     playButton.addListener(this);
     playButton.setButtonText("Play");
@@ -35,34 +37,41 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     gainSlider.addListener(this);
     gainSlider.setRange(0.0, 1.0);
     gainSlider.setValue(1.0);
+    gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+    gainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
     addAndMakeVisible(gainLabel);
     gainLabel.setText("Gain", juce::dontSendNotification);
-    gainLabel.attachToComponent(&gainSlider, true);
+    // gainLabel.attachToComponent(&gainSlider, true);
 
     addAndMakeVisible(speedSlider);
     speedSlider.addListener(this);
     speedSlider.setRange(1.0, 5.0);
     speedSlider.setValue(1.0);
+    speedSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+    speedSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
     addAndMakeVisible(speedLabel);
     speedLabel.setText("Speed", juce::dontSendNotification);
-    speedLabel.attachToComponent(&speedSlider, true);
+    // speedLabel.attachToComponent(&speedSlider, true);
 
     addAndMakeVisible(bassSlider);
     bassSlider.addListener(this);
     bassSlider.setRange(50.0, 20000.0);
     bassSlider.setValue(20000.0);
     bassSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    bassSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
     addAndMakeVisible(bassLabel);
     bassLabel.setText("Bass", juce::dontSendNotification);
+    bassLabel.attachToComponent(&bassSlider, false);
 
     addAndMakeVisible(trebleSlider);
     trebleSlider.addListener(this);
     trebleSlider.setRange(50.0, 20000.0);
     trebleSlider.setValue(50.0);
     trebleSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    trebleSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
     addAndMakeVisible(trebleLabel);
     trebleLabel.setText("Treble", juce::dontSendNotification);
@@ -77,12 +86,17 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
 
 DeckGUI::~DeckGUI()
 {
+    setLookAndFeel(nullptr);
     stopTimer();
 }
 
 void DeckGUI::paint(juce::Graphics &g)
 {
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId)); // clear the background
+    g.fillAll(juce::Colour::fromRGB(16, 7, 32));
+
+    g.setColour(juce::Colours::grey);
+    g.drawRect(getLocalBounds(), 1); // draw an outline around the component
 }
 
 void DeckGUI::resized()
@@ -93,25 +107,21 @@ void DeckGUI::resized()
 
     auto trackNameArea = area.removeFromTop(rowHeight);
     trackName.setBounds(trackNameArea);
-
-    auto waveformArea = area.removeFromTop(rowHeight);
+    auto waveformArea = area.removeFromTop(2 * rowHeight);
     waveformDisplay.setBounds(waveformArea);
 
+    auto sliders = area.removeFromTop(rowHeight * 4);
+    auto w = getWidth() / 4;
+    bassSlider.setBounds(sliders.removeFromLeft(w).reduced(10));
+    trebleSlider.setBounds(sliders.removeFromLeft(w));
+    gainSlider.setBounds(sliders.removeFromLeft(w).reduced(10, 0));
+    speedSlider.setBounds(sliders.removeFromLeft(w));
+
     auto buttonArea = area.removeFromTop(rowHeight);
-    auto buttonWidth = getWidth() / 4;
-    playButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
-    pauseButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
-    stopButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
-    loadButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
-
-    auto sliderArea = area.removeFromTop(rowHeight * 2);
-    auto padding = sliderArea.removeFromLeft(50);
-    gainSlider.setBounds(sliderArea.removeFromTop(rowHeight));
-    speedSlider.setBounds(sliderArea.removeFromTop(rowHeight));
-
-    auto eqArea = area.removeFromTop(rowHeight * 2);
-    bassSlider.setBounds(eqArea.removeFromLeft(getWidth() / 2));
-    trebleSlider.setBounds(eqArea.removeFromLeft(getWidth() / 2));
+    playButton.setBounds(buttonArea.removeFromLeft(w));
+    pauseButton.setBounds(buttonArea.removeFromLeft(w));
+    stopButton.setBounds(buttonArea.removeFromLeft(w));
+    loadButton.setBounds(buttonArea.removeFromLeft(w));
 }
 
 void DeckGUI::buttonClicked(juce::Button *button)
