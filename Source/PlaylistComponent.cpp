@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    PlaylistComponent.cpp
-    Created: 29 Jun 2022 3:21:22pm
-    Author:  cristi
-
-  ==============================================================================
-*/
-
 #include <JuceHeader.h>
 #include "PlaylistComponent.h"
 #include <fstream>
@@ -207,4 +197,52 @@ void PlaylistComponent::filesDropped(const juce::StringArray &files, int x, int 
         auto file = juce::File{filename};
         insertUniqueTrack(Track(file));
     }
+}
+
+void insertUniqueTrack(const Track &newTrack)
+{
+    for (const auto &track : tracks)
+    {
+        if (newTrack.audioURL == track.audioURL)
+        {
+            return;
+        }
+    }
+    tracks.push_back(newTrack);
+    textEditorTextChanged(searchTrack);
+    updateTable();
+}
+
+void selectedRowsChanged(int row)
+{
+    selectedRows = tableComponent.getSelectedRows();
+}
+
+int getFirstSelectedRow()
+{
+    if (selectedRows.size() > 0)
+    {
+        return selectedRows[0];
+    }
+    return -1;
+}
+
+void updateTable()
+{
+    tableComponent.updateContent();
+    tableComponent.repaint();
+}
+
+void textEditorTextChanged(juce::TextEditor &textEditor)
+{
+    filteredTracks.clear();
+    auto text = textEditor.getText();
+    for (const auto &track : tracks)
+    {
+        if (track.title.containsIgnoreCase(text))
+        {
+            filteredTracks.push_back(track);
+        }
+    }
+    updateTable();
 }

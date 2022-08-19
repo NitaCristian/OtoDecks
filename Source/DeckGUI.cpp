@@ -1,12 +1,4 @@
-/*
-  ==============================================================================
-
-    DeckGUI.cpp
-    Created: 28 Jun 2022 1:55:53pm
-    Author:  cristi
-
-  ==============================================================================
-*/
+// TODO - remove unnecessary imports
 
 #include <JuceHeader.h>
 #include "DeckGUI.h"
@@ -15,6 +7,10 @@
 DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
     : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse, _player), playlist(playlistComponent)
 {
+    // TODO - REFACTOR
+    // 1. Remove unused elements
+    // 2. Introduce methods that initialize components, eg. initButton(button, text), initSlider(slider, min, max, val, style)
+    // 3. Clean up the initializer list
     setLookAndFeel(&customLookAndFeel);
 
     addAndMakeVisible(playButton);
@@ -92,26 +88,28 @@ DeckGUI::~DeckGUI()
 
 void DeckGUI::paint(juce::Graphics &g)
 {
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId)); // clear the background
+    // Clear the background
+    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(juce::Colour::fromRGB(16, 7, 32));
 
+    // Draw an outline around the component
     g.setColour(juce::Colours::grey);
-    g.drawRect(getLocalBounds(), 1); // draw an outline around the component
+    g.drawRect(getLocalBounds(), 1);
 }
 
 void DeckGUI::resized()
 {
+    // TODO - REFACTOR
+    // 1. Add comments
+    // 2. Maybe refactor the way bounds are set
     auto area = getLocalBounds();
-
     auto rowHeight = getHeight() / 8;
 
-    auto trackNameArea = area.removeFromTop(rowHeight);
-    trackName.setBounds(trackNameArea);
-    auto waveformArea = area.removeFromTop(2 * rowHeight);
-    waveformDisplay.setBounds(waveformArea);
+    trackName.setBounds(area.removeFromTop(rowHeight));
+    waveformDisplay.setBounds(area.removeFromTop(2 * rowHeight));
 
-    auto sliders = area.removeFromTop(rowHeight * 4);
     auto w = getWidth() / 4;
+    auto sliders = area.removeFromTop(4 * rowHeight);
     bassSlider.setBounds(sliders.removeFromLeft(w).reduced(10));
     trebleSlider.setBounds(sliders.removeFromLeft(w));
     gainSlider.setBounds(sliders.removeFromLeft(w).reduced(10, 0));
@@ -132,15 +130,17 @@ void DeckGUI::buttonClicked(juce::Button *button)
     }
     if (button == &pauseButton)
     {
-        djAudioPlayer->stop();
+        djAudioPlayer->pause();
     }
     if (button == &stopButton)
     {
         djAudioPlayer->stop();
-        djAudioPlayer->setPosition(0);
     }
     if (button == &loadButton)
     {
+        // TODO - REFACTOR
+        // 1. Put code into a method
+        // 2. Make the "playlist" member give the track directly instead of the index
         int firstSelectedSong = playlist->getFirstSelectedRow();
         if (firstSelectedSong != -1)
         {
@@ -180,6 +180,9 @@ bool DeckGUI::isInterestedInFileDrag(const juce::StringArray &files)
 
 void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y)
 {
+    // TODO - REFACTOR
+    // Don't use a for loop
+    // Just use the first file: files[0]
     for (const auto &filename : files)
     {
         auto file = juce::File{filename};

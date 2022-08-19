@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    WaveformDisplay.h
-    Created: 28 Jun 2022 4:53:51pm
-    Author:  cristi
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -17,42 +7,40 @@
 //==============================================================================
 /*
  */
+
+// TODO - Refactor
+// Add comments
+
 class WaveformDisplay : public juce::Component, public juce::ChangeListener
 {
 public:
-  WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *djAudioPlayer);
-  ~WaveformDisplay() override;
+    WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *djAudioPlayer);
 
-  void paint(juce::Graphics &) override;
-  void resized() override;
+    ~WaveformDisplay() override;
 
-  void loadURL(const juce::URL &audioURL);
+    //==============================================================================
 
-  void changeListenerCallback(juce::ChangeBroadcaster *source) override;
+    void paint(juce::Graphics &) override;
 
-  void setPositionRelative(double pos);
+    void resized() override;
 
-  void mouseDown(const juce::MouseEvent &event)
-  {
-    auto mouseX = event.x;
-    auto ratio = mouseX * 1.0 / getWidth();
-    djAudioPlayer->setPositionRelative(ratio);
-    setPositionRelative(djAudioPlayer->getPositionRelative());
-  }
+    //==============================================================================
 
-  void mouseDrag(const juce::MouseEvent &event)
-  {
-    auto mouseX = event.x;
-    auto ratio = mouseX * 1.0 / getWidth();
-    djAudioPlayer->setPositionRelative(ratio);
-    setPositionRelative(djAudioPlayer->getPositionRelative());
-  }
+    void loadURL(const juce::URL &audioURL);
+
+    void changeListenerCallback(juce::ChangeBroadcaster *source) override;
+
+    void setPositionRelative(double pos);
+
+    void mouseDown(const juce::MouseEvent &event);
+
+    void mouseDrag(const juce::MouseEvent &event);
 
 private:
-  juce::AudioThumbnail audioThumbnail;
-  bool fileLoaded;
-  double position;
-  DJAudioPlayer *djAudioPlayer;
+    juce::AudioThumbnail audioThumbnail;
+    bool fileLoaded;
+    double position;
+    DJAudioPlayer *djAudioPlayer;
 
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformDisplay)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformDisplay)
 };

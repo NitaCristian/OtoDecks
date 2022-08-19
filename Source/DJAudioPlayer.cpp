@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    DJAudioPlayer.cpp
-    Created: 28 Jun 2022 12:26:30pm
-    Author:  cristi
-
-  ==============================================================================
-*/
-
 #include "DJAudioPlayer.h"
 
 DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager &_formatManager) : formatManager(_formatManager)
@@ -89,6 +79,11 @@ void DJAudioPlayer::setPosition(double posInSec)
     transportSource.setPosition(posInSec);
 }
 
+double DJAudioPlayer::getPositionRelative() const
+{
+    return transportSource.getCurrentPosition() / transportSource.getLengthInSeconds();
+}
+
 void DJAudioPlayer::setPositionRelative(double pos)
 {
     if (pos < 0.0 || pos > 1.0)
@@ -105,12 +100,23 @@ void DJAudioPlayer::start()
     transportSource.start();
 }
 
-void DJAudioPlayer::stop()
+void DJAudioPlayer::pause()
 {
     transportSource.stop();
 }
 
-double DJAudioPlayer::getPositionRelative() const
+void DJAudioPlayer::stop()
 {
-    return transportSource.getCurrentPosition() / transportSource.getLengthInSeconds();
+    pause();
+    setPosition(0);
+}
+
+void setBass(double frequency)
+{
+    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(44100, frequency));
+}
+
+void setTreble(double frequency)
+{
+    trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(44100, frequency));
 }

@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    WaveformDisplay.cpp
-    Created: 28 Jun 2022 4:53:51pm
-    Author:  cristi
-
-  ==============================================================================
-*/
-
 #include <JuceHeader.h>
 #include "WaveformDisplay.h"
 
@@ -69,4 +59,20 @@ void WaveformDisplay::setPositionRelative(double pos)
         position = pos;
         repaint();
     }
+}
+
+void mouseDown(const juce::MouseEvent &event)
+{
+    auto mouseX = event.x;
+    auto ratio = mouseX * 1.0 / getWidth();
+    djAudioPlayer->setPositionRelative(ratio);
+    setPositionRelative(djAudioPlayer->getPositionRelative());
+}
+
+void mouseDrag(const juce::MouseEvent &event)
+{
+    auto mouseX = event.x;
+    auto ratio = mouseX * 1.0 / getWidth();
+    djAudioPlayer->setPositionRelative(ratio);
+    setPositionRelative(djAudioPlayer->getPositionRelative());
 }
