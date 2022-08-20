@@ -1,12 +1,10 @@
-// TODO - remove unnecessary imports
-
-#include <JuceHeader.h>
 #include "DeckGUI.h"
 
-//==============================================================================
-DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
-    : djAudioPlayer{_player}, waveformDisplay(formatManagerToUse, cacheToUse, _player), playlist(playlistComponent)
-{
+DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse,
+                 juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
+        : djAudioPlayer{_player},
+          waveformDisplay(formatManagerToUse, cacheToUse, _player),
+          playlist(playlistComponent) {
     // TODO - REFACTOR
     // 1. Remove unused elements
     // 2. Introduce methods that initialize components, eg. initButton(button, text), initSlider(slider, min, max, val, style)
@@ -73,6 +71,7 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     trebleLabel.setText("Treble", juce::dontSendNotification);
 
     addAndMakeVisible(trackName);
+    trackName.setText("No track", juce::dontSendNotification);
     trackName.setFont(juce::Font(32.0f));
 
     addAndMakeVisible(waveformDisplay);
@@ -80,14 +79,14 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
     startTimer(500);
 }
 
-DeckGUI::~DeckGUI()
-{
+DeckGUI::~DeckGUI() {
     setLookAndFeel(nullptr);
     stopTimer();
 }
 
-void DeckGUI::paint(juce::Graphics &g)
-{
+//==============================================================================
+
+void DeckGUI::paint(juce::Graphics &g) {
     // Clear the background
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(juce::Colour::fromRGB(16, 7, 32));
@@ -97,104 +96,86 @@ void DeckGUI::paint(juce::Graphics &g)
     g.drawRect(getLocalBounds(), 1);
 }
 
-void DeckGUI::resized()
-{
-    // TODO - REFACTOR
-    // 1. Add comments
-    // 2. Maybe refactor the way bounds are set
+void DeckGUI::resized() {
     auto area = getLocalBounds();
     auto rowHeight = getHeight() / 8;
 
     trackName.setBounds(area.removeFromTop(rowHeight));
     waveformDisplay.setBounds(area.removeFromTop(2 * rowHeight));
 
-    auto w = getWidth() / 4;
+    auto width = getWidth() / 4;
+
     auto sliders = area.removeFromTop(4 * rowHeight);
-    bassSlider.setBounds(sliders.removeFromLeft(w).reduced(10));
-    trebleSlider.setBounds(sliders.removeFromLeft(w));
-    gainSlider.setBounds(sliders.removeFromLeft(w).reduced(10, 0));
-    speedSlider.setBounds(sliders.removeFromLeft(w));
+    bassSlider.setBounds(sliders.removeFromLeft(width).reduced(10));
+    trebleSlider.setBounds(sliders.removeFromLeft(width));
+    gainSlider.setBounds(sliders.removeFromLeft(width).reduced(10, 0));
+    speedSlider.setBounds(sliders.removeFromLeft(width));
 
     auto buttonArea = area.removeFromTop(rowHeight);
-    playButton.setBounds(buttonArea.removeFromLeft(w));
-    pauseButton.setBounds(buttonArea.removeFromLeft(w));
-    stopButton.setBounds(buttonArea.removeFromLeft(w));
-    loadButton.setBounds(buttonArea.removeFromLeft(w));
+    playButton.setBounds(buttonArea.removeFromLeft(width));
+    pauseButton.setBounds(buttonArea.removeFromLeft(width));
+    stopButton.setBounds(buttonArea.removeFromLeft(width));
+    loadButton.setBounds(buttonArea.removeFromLeft(width));
 }
 
-void DeckGUI::buttonClicked(juce::Button *button)
-{
-    if (button == &playButton)
-    {
+//==============================================================================
+
+void DeckGUI::buttonClicked(juce::Button *button) {
+    if (button == &playButton) {
         djAudioPlayer->start();
     }
-    if (button == &pauseButton)
-    {
+    if (button == &pauseButton) {
         djAudioPlayer->pause();
     }
-    if (button == &stopButton)
-    {
+    if (button == &stopButton) {
         djAudioPlayer->stop();
     }
-    if (button == &loadButton)
-    {
-        // TODO - REFACTOR
-        // 1. Put code into a method
-        // 2. Make the "playlist" member give the track directly instead of the index
-        int firstSelectedSong = playlist->getFirstSelectedRow();
-        if (firstSelectedSong != -1)
-        {
-            auto track = playlist->tracks[firstSelectedSong];
-            auto audioURL = track.audioURL;
-            this->djAudioPlayer->loadURL(audioURL);
-            this->waveformDisplay.loadURL(audioURL);
-            this->trackName.setText(track.title, juce::dontSendNotification);
+    if (button == &loadButton) {
+        auto track = playlist->getFirstSelectedTrack();
+        // If a track couldn't be loaded, just exit
+        if (track.getDuration() == -1) {
+            return;
         }
+        auto audioURL = track.getAudioURL();
+        this->djAudioPlayer->loadURL(audioURL);
+        this->waveformDisplay.loadURL(audioURL);
+        this->trackName.setText(track.getTitle(), juce::dontSendNotification);
     }
 }
 
-void DeckGUI::sliderValueChanged(juce::Slider *slider)
-{
-    if (slider == &gainSlider)
-    {
+//==============================================================================
+
+void DeckGUI::sliderValueChanged(juce::Slider *slider) {
+    if (slider == &gainSlider) {
         djAudioPlayer->setGain(slider->getValue());
     }
-    if (slider == &speedSlider)
-    {
+    if (slider == &speedSlider) {
         djAudioPlayer->setSpeed(slider->getValue());
     }
-    if (slider == &bassSlider)
-    {
+    if (slider == &bassSlider) {
         djAudioPlayer->setBass(slider->getValue());
     }
-    if (slider == &trebleSlider)
-    {
+    if (slider == &trebleSlider) {
         djAudioPlayer->setTreble(slider->getValue());
     }
 }
 
-bool DeckGUI::isInterestedInFileDrag(const juce::StringArray &files)
-{
+//==============================================================================
+
+bool DeckGUI::isInterestedInFileDrag(const juce::StringArray &files) {
     return true;
 }
 
-void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y)
-{
-    // TODO - REFACTOR
-    // Don't use a for loop
-    // Just use the first file: files[0]
-    for (const auto &filename : files)
-    {
-        auto file = juce::File{filename};
-        auto audioURL = juce::URL{file};
-        djAudioPlayer->loadURL(audioURL);
-        waveformDisplay.loadURL(audioURL);
-        playlist->insertUniqueTrack(Track(file));
-        return;
-    }
+void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y) {
+    auto file = juce::File{files[0]};
+    auto audioURL = juce::URL{file};
+    djAudioPlayer->loadURL(audioURL);
+    waveformDisplay.loadURL(audioURL);
+    playlist->insertUniqueTrack(Track(file));
 }
 
-void DeckGUI::timerCallback()
-{
+//==============================================================================
+
+void DeckGUI::timerCallback() {
     waveformDisplay.setPositionRelative(djAudioPlayer->getPositionRelative());
 }

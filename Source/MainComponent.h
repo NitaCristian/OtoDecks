@@ -5,8 +5,7 @@
 #include "DeckGUI.h"
 #include "PlaylistComponent.h"
 
-class MainComponent : public juce::AudioAppComponent
-{
+class MainComponent : public juce::AudioAppComponent {
 public:
     //==============================================================================
 
@@ -29,9 +28,9 @@ public:
     void resized() override;
 
 private:
-    // TODO - Comment
+    // A list of available audio formats
     juce::AudioFormatManager formatManager;
-    // TODO - Comment
+    // A list used to manage multiple AudioThumbnail objects
     juce::AudioThumbnailCache thumbnailCache{100};
 
     // Playlist that stores all the tracks
@@ -42,7 +41,7 @@ private:
     // First deck to control the dj player
     DeckGUI deckGUI1{&player1, formatManager, thumbnailCache, &playlistComponent};
 
-    // DjAudioPlyer for the second deck
+    // DjAudioPlayer for the second deck
     DJAudioPlayer player2{formatManager};
     // Second deck to control the dj player
     DeckGUI deckGUI2{&player2, formatManager, thumbnailCache, &playlistComponent};

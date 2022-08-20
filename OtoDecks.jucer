@@ -5,6 +5,15 @@
               defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;JUCE_USE_MP3AUDIOFORMAT=1">
   <MAINGROUP id="fYVq2I" name="OtoDecks">
     <GROUP id="{2FEA71EE-D8BD-8564-74DD-DF371D3B4EF1}" name="Source">
+      <FILE id="Di8SB0" name="DeckGUI.cpp" compile="1" resource="0" file="Source/DeckGUI.cpp"/>
+      <FILE id="VA9RsI" name="DeckGUI.h" compile="0" resource="0" file="Source/DeckGUI.h"/>
+      <FILE id="WzBULo" name="DJAudioPlayer.cpp" compile="1" resource="0"
+            file="Source/DJAudioPlayer.cpp"/>
+      <FILE id="Aw8okp" name="DJAudioPlayer.h" compile="0" resource="0" file="Source/DJAudioPlayer.h"/>
+      <FILE id="tY6BaA" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="HcaCiz" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+      <FILE id="ov3gKX" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="eoGDtW" name="MyLookAndFeel.cpp" compile="1" resource="0"
             file="Source/MyLookAndFeel.cpp"/>
       <FILE id="HNOzXD" name="MyLookAndFeel.h" compile="0" resource="0" file="Source/MyLookAndFeel.h"/>
@@ -12,19 +21,12 @@
             file="Source/PlaylistComponent.cpp"/>
       <FILE id="NchxB4" name="PlaylistComponent.h" compile="0" resource="0"
             file="Source/PlaylistComponent.h"/>
+      <FILE id="TcaEY8" name="Track.cpp" compile="1" resource="0" file="Source/Track.cpp"/>
+      <FILE id="tlMpy0" name="Track.h" compile="0" resource="0" file="Source/Track.h"/>
       <FILE id="bCkTZT" name="WaveformDisplay.cpp" compile="1" resource="0"
             file="Source/WaveformDisplay.cpp"/>
       <FILE id="re66fO" name="WaveformDisplay.h" compile="0" resource="0"
             file="Source/WaveformDisplay.h"/>
-      <FILE id="Di8SB0" name="DeckGUI.cpp" compile="1" resource="0" file="Source/DeckGUI.cpp"/>
-      <FILE id="VA9RsI" name="DeckGUI.h" compile="0" resource="0" file="Source/DeckGUI.h"/>
-      <FILE id="WzBULo" name="DJAudioPlayer.cpp" compile="1" resource="0"
-            file="Source/DJAudioPlayer.cpp"/>
-      <FILE id="Aw8okp" name="DJAudioPlayer.h" compile="0" resource="0" file="Source/DJAudioPlayer.h"/>
-      <FILE id="tY6BaA" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="ov3gKX" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
-      <FILE id="HcaCiz" name="MainComponent.cpp" compile="1" resource="0"
-            file="Source/MainComponent.cpp"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_USE_MP3AUDIOFORMAT="1"/>
