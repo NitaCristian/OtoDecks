@@ -77,3 +77,16 @@ void MyLookAndFeel::drawButtonText(juce::Graphics &g, juce::TextButton &button, 
                          leftIndent + offset, yIndent + offset, textWidth, button.getHeight() - yIndent * 2 - edge,
                          juce::Justification::centred, 2);
 }
+
+void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
+                                     float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
+                                     juce::Slider &s) {
+
+    if (style == juce::Slider::SliderStyle::LinearBarVertical) {
+        g.fillAll(juce::Colours::red);
+        g.fillRect(x, y, width, int(sliderPos));
+        g.setColour(juce::Colours::white);
+        g.drawText(s.getName(), x, y, width, height, juce::Justification::centredTop, true);
+    }
+
+}

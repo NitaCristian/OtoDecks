@@ -22,24 +22,29 @@ PlaylistComponent::PlaylistComponent() {
     removeTracks.setButtonText("Remove tracks");
     removeTracks.addListener(this);
 
-    addAndMakeVisible(savePlaylist);
-    savePlaylist.setButtonText("Save playlist");
-    savePlaylist.addListener(this);
+    addAndMakeVisible(savePlaylistBtn);
+    savePlaylistBtn.setButtonText("Save playlist");
+    savePlaylistBtn.addListener(this);
 
-    addAndMakeVisible(loadPlaylist);
-    loadPlaylist.setButtonText("Load playlist");
-    loadPlaylist.addListener(this);
+    addAndMakeVisible(loadPlaylistBtn);
+    loadPlaylistBtn.setButtonText("Load playlist");
+    loadPlaylistBtn.addListener(this);
 
     addAndMakeVisible(clearPlaylist);
     clearPlaylist.setButtonText("Clear playlist");
     clearPlaylist.addListener(this);
 
-    getPlaylistState();
+    juce::File playlist = juce::File::getCurrentWorkingDirectory().getChildFile("OtoDecks.state");
+    if (playlist.existsAsFile()) {
+        loadPlaylist(playlist);
+    }
 }
 
 PlaylistComponent::~PlaylistComponent() {
     setLookAndFeel(nullptr);
-    savePlaylistState();
+    juce::File playlist = juce::File::getCurrentWorkingDirectory().getChildFile("OtoDecks.state");
+    playlist.create();
+    savePlaylist(playlist, createPlaylist());
 }
 
 //==============================================================================
@@ -56,14 +61,14 @@ void PlaylistComponent::resized() {
     // Set the width of one button
     auto buttonWidth = getWidth() / 8;
     // Get the area of the buttons
-    auto buttonsArea = area.removeFromLeft(buttonWidth);
+    auto buttonsArea = area.removeFromLeft(buttonWidth).reduced(5);
     // Set the height of one button
     auto buttonHeight = getHeight() / 5;
 
     addTracks.setBounds(buttonsArea.removeFromTop(buttonHeight));
     removeTracks.setBounds(buttonsArea.removeFromTop(buttonHeight));
-    savePlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
-    loadPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    savePlaylistBtn.setBounds(buttonsArea.removeFromTop(buttonHeight));
+    loadPlaylistBtn.setBounds(buttonsArea.removeFromTop(buttonHeight));
     clearPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
 
     searchTrack.setBounds(area.removeFromTop(50));
@@ -79,7 +84,6 @@ int PlaylistComponent::getNumRows() {
 void
 PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected) {
     g.fillAll(juce::Colours::darkgrey);
-
     if (rowIsSelected) {
         g.fillAll(juce::Colours::orange);
     }
@@ -114,9 +118,12 @@ juce::Component *PlaylistComponent::refreshComponentForCell(int rowNumber, int c
     return existingComponentToUpdate;
 }
 
+void PlaylistComponent::selectedRowsChanged(int row) {
+    selectedRows = tableComponent.getSelectedRows();
+}
+
 //==============================================================================
 
-// TODO - Refactor this section
 void PlaylistComponent::buttonClicked(juce::Button *button) {
     if (button == &addTracks) {
         auto fileChooserFlags = juce::FileBrowserComponent::canSelectMultipleItems;
@@ -130,33 +137,26 @@ void PlaylistComponent::buttonClicked(juce::Button *button) {
                              });
     }
     if (button == &removeTracks) {
-        auto selectedRows = tableComponent.getSelectedRows();
         for (auto i = 0; i < selectedRows.size(); i++) {
             tracks.erase(tracks.begin() + selectedRows[i]);
         }
+        updateFilteredTracks(searchTrack.getText());
         updateTable();
     }
-    if (button == &savePlaylist) {
+    if (button == &savePlaylistBtn) {
         auto fileChooserFlags = juce::FileBrowserComponent::saveMode;
         fChooser.launchAsync(fileChooserFlags,
                              [this](const juce::FileChooser &chooser) {
-                                 auto newFile = chooser.getResult();
-                                 for (const auto &track: tracks) {
-                                     newFile.appendText(track.toString());
-                                 }
-                                 newFile.create();
+                                 auto file = chooser.getResult();
+                                 savePlaylist(file, createPlaylist());
                              });
     }
-    if (button == &loadPlaylist) {
+    if (button == &loadPlaylistBtn) {
         auto fileChooserFlags = juce::FileBrowserComponent::canSelectFiles;
         fChooser.launchAsync(fileChooserFlags,
                              [this](const juce::FileChooser &chooser) {
                                  auto file = chooser.getResult();
-                                 juce::StringArray lines;
-                                 file.readLines(lines);
-                                 for (const auto &line: lines) {
-                                     insertUniqueTrack(Track(juce::File(line)));
-                                 }
+                                 loadPlaylist(file);
                              });
         updateTable();
     }
@@ -182,13 +182,8 @@ void PlaylistComponent::filesDropped(const juce::StringArray &files, int x, int 
 //==============================================================================
 
 void PlaylistComponent::textEditorTextChanged(juce::TextEditor &textEditor) {
-    filteredTracks.clear();
     auto text = textEditor.getText();
-    for (const auto &track: tracks) {
-        if (track.getTitle().containsIgnoreCase(text)) {
-            filteredTracks.push_back(track);
-        }
-    }
+    updateFilteredTracks(text);
     updateTable();
 }
 
@@ -201,12 +196,8 @@ void PlaylistComponent::insertUniqueTrack(const Track &newTrack) {
         }
     }
     tracks.push_back(newTrack);
-    textEditorTextChanged(searchTrack);
+    updateFilteredTracks(searchTrack.getText());
     updateTable();
-}
-
-void PlaylistComponent::selectedRowsChanged(int row) {
-    selectedRows = tableComponent.getSelectedRows();
 }
 
 int PlaylistComponent::getFirstSelectedRow() {
@@ -221,30 +212,57 @@ void PlaylistComponent::updateTable() {
     tableComponent.repaint();
 }
 
-void PlaylistComponent::savePlaylistState() {
-    juce::File stateFile = juce::File::getCurrentWorkingDirectory().getChildFile("OtoDecks.state");
-
-    if (!stateFile.existsAsFile()) {
-        stateFile.create();
-    }
-
+void PlaylistComponent::updateFilteredTracks(const juce::String &text) {
+    filteredTracks.clear();
     for (const auto &track: tracks) {
-        stateFile.appendText(track.toString() + '\n');
+        if (track.getTitle().containsIgnoreCase(text)) {
+            filteredTracks.push_back(track);
+        }
     }
 }
 
-void PlaylistComponent::getPlaylistState() {
-    juce::File stateFile = juce::File::getCurrentWorkingDirectory().getChildFile("OtoDecks.state");
-
-    if (!stateFile.existsAsFile()) {
-        return;
+Track PlaylistComponent::getFirstSelectedTrack() {
+    auto index = getFirstSelectedRow();
+    if (index == -1) {
+        return {};
     }
+    return tracks[index];
+}
 
-    juce::StringArray lines;
-    stateFile.readLines(lines);
+juce::String PlaylistComponent::createPlaylist() {
+    juce::String playlistContents;
+    // For every track
+    for (const auto &track: tracks) {
+        // Stringify the data and add it to the playlist contents
+        playlistContents += track.toString() + "\n";
+    }
+    return playlistContents;
+}
 
-    for (const auto &line: lines) {
-        // Tokenize line
-        // insertUniqueTrack(Track{title,});
+void PlaylistComponent::savePlaylist(const juce::File &playlistFile, const juce::String &contents) {
+    // Create a temporary file
+    juce::TemporaryFile temporaryFile(playlistFile);
+    // Create an output stream
+    juce::FileOutputStream outputStream(temporaryFile.getFile());
+
+    outputStream.setNewLineString("\n");
+    outputStream.writeString(contents);
+    outputStream.flush();
+    // TODO-remove null character
+    temporaryFile.overwriteTargetFileWithTemporary();
+}
+
+void PlaylistComponent::loadPlaylist(const juce::File &playlistFile) {
+    // Create an input stream
+    std::unique_ptr<juce::FileInputStream> inputStream(playlistFile.createInputStream());
+    // While the stream has data to read
+    while (!inputStream->isExhausted()) {
+        // Read the next line
+        juce::String line = inputStream->readNextLine();
+        // Tokenize the line into elements delimited by a comma
+        juce::StringArray tokens;
+        tokens.addTokens(line, ",", "\"");
+        // Insert a unique track using the tokens
+        insertUniqueTrack(Track{tokens[0], tokens[1], tokens[2].getDoubleValue(), tokens[3]});
     }
 }

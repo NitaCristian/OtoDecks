@@ -79,8 +79,7 @@ public:
      * @param existingComponentToUpdate
      * @return
      */
-    juce::Component *refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected,
-                                             Component *existingComponentToUpdate) override;
+    juce::Component *refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component *existingComponentToUpdate) override;
 
     /**
      * Method called when the rows have been selected
@@ -143,32 +142,24 @@ public:
      */
     int getFirstSelectedRow();
 
-    Track getFirstSelectedTrack() {
-        auto index = getFirstSelectedRow();
-        if (index == -1)
-        {
-            return {};
-        }
-        return tracks[index];
-    }
+    Track getFirstSelectedTrack();
 
     /**
      * Method to update the table component after changes to the track list have been made
      */
     void updateTable();
 
-    /**
-     * Method to save the contents of the playlist
-     */
-    void savePlaylistState();
+    juce::String createPlaylist();
 
-    /**
-     * Method to restore the contents of the playlist
-     */
-    void getPlaylistState();
-    // function to split tokens
-    // TODO - TODO
-    // TODO - refactor buttons methods and split them into functions.
+    // TODO - comments
+    // TODO - playlist file extension and checking
+    // todo - check uploaded file extension; findFormatForFileExtension() - audioformatmanager
+
+    void savePlaylist(const juce::File &playlistFile, const juce::String &contents);
+
+    void loadPlaylist(const juce::File &playlistFile);
+
+    void updateFilteredTracks(const juce::String &text);
 
 private:
     // Custom LookAndFeel
@@ -180,9 +171,9 @@ private:
     // Button to remove tracks from the playlist
     juce::TextButton removeTracks;
     // Button to save the playlist
-    juce::TextButton savePlaylist;
+    juce::TextButton savePlaylistBtn;
     // Button to load a playlist
-    juce::TextButton loadPlaylist;
+    juce::TextButton loadPlaylistBtn;
     // Button to remove all tracks from the playlist
     juce::TextButton clearPlaylist;
     // Text editor to search for specific tracks in the playlist

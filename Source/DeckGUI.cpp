@@ -1,9 +1,8 @@
 #include "DeckGUI.h"
 
-DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManagerToUse,
-                 juce::AudioThumbnailCache &cacheToUse, PlaylistComponent *playlistComponent)
-        : djAudioPlayer{_player},
-          waveformDisplay(formatManagerToUse, cacheToUse, _player),
+DeckGUI::DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent)
+        : djAudioPlayer{player},
+          waveformDisplay(formatManager, cache, player),
           playlist(playlistComponent) {
     // TODO - REFACTOR
     // 1. Remove unused elements
@@ -29,10 +28,12 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
 
     addAndMakeVisible(gainSlider);
     gainSlider.addListener(this);
+    gainSlider.setName("Gain");
     gainSlider.setRange(0.0, 1.0);
     gainSlider.setValue(1.0);
     gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
-    gainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, gainSlider.getTextBoxWidth(),
+                               gainSlider.getTextBoxHeight());
 
     addAndMakeVisible(gainLabel);
     gainLabel.setText("Gain", juce::dontSendNotification);
@@ -51,9 +52,9 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
 
     addAndMakeVisible(bassSlider);
     bassSlider.addListener(this);
-    bassSlider.setRange(50.0, 20000.0);
-    bassSlider.setValue(20000.0);
-    bassSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    bassSlider.setRange(50.0, 10000.0);
+    bassSlider.setValue(10000.0);
+    bassSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     bassSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
 
     addAndMakeVisible(bassLabel);
@@ -62,10 +63,12 @@ DeckGUI::DeckGUI(DJAudioPlayer *_player, juce::AudioFormatManager &formatManager
 
     addAndMakeVisible(trebleSlider);
     trebleSlider.addListener(this);
-    trebleSlider.setRange(50.0, 20000.0);
+    trebleSlider.setRange(50.0, 5000.0);
     trebleSlider.setValue(50.0);
-    trebleSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    trebleSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    trebleSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+//    trebleSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    trebleSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, trebleSlider.getTextBoxWidth(),
+                                 trebleSlider.getTextBoxHeight());
 
     addAndMakeVisible(trebleLabel);
     trebleLabel.setText("Treble", juce::dontSendNotification);

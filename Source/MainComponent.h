@@ -36,6 +36,8 @@ private:
     // Playlist that stores all the tracks
     PlaylistComponent playlistComponent;
 
+    // TODO - Red and Blue decks
+
     // DJAudioPlayer for the first deck
     DJAudioPlayer player1{formatManager};
     // First deck to control the dj player

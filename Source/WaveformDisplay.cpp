@@ -1,7 +1,6 @@
 #include "WaveformDisplay.h"
 
-WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse,
-                                 DJAudioPlayer *_djAudioPlayer)
+WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *_djAudioPlayer)
         : audioThumbnail(1000, formatManagerToUse, cacheToUse),
           fileLoaded(false),
           position(0.0),

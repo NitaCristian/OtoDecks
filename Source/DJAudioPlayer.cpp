@@ -13,7 +13,7 @@ void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate
     resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 
     bassFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 20000.0));
+    bassFilterSource.setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 10000.0));
 
     trebleFilterSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
     trebleFilterSource.setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 50.0));

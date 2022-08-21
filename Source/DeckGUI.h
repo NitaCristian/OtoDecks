@@ -22,12 +22,11 @@ public:
      * Constructor method that initializes private members and components used
      *
      * @param player DJAudioPlayer that corresponds to this deck
-     * @param formatManagerToUse a list of available audio formats
-     * @param cacheToUse manages multiple AudioThumbnail objects
+     * @param formatManager a list of available audio formats
+     * @param cache manages multiple AudioThumbnail objects
      * @param playlistComponent a pointer to the playlist
      */
-    DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse,
-            PlaylistComponent *playlistComponent);
+    DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent);
 
     /**
     * Destructor method used to deallocate memory and cleanup before the object is destroyed
