@@ -226,10 +226,10 @@ void PlaylistComponent::updateFilteredTracks(const juce::String &text) {
 
 Track PlaylistComponent::getFirstSelectedTrack() {
     auto index = getFirstSelectedRow();
-    if (index == -1) {
+    if (index == -1 || index >= filteredTracks.size()) {
         return {};
     }
-    return tracks[index];
+    return filteredTracks[index];
 }
 
 juce::String PlaylistComponent::createPlaylist() {
