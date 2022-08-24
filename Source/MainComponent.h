@@ -32,22 +32,16 @@ private:
     juce::AudioFormatManager formatManager;
     // A list used to manage multiple AudioThumbnail objects
     juce::AudioThumbnailCache thumbnailCache{100};
-
     // Playlist that stores all the tracks
     PlaylistComponent playlistComponent;
-
-    // TODO - Red and Blue decks
-
     // DJAudioPlayer for the first deck
     DJAudioPlayer player1{formatManager};
     // First deck to control the dj player
-    DeckGUI deckGUI1{&player1, formatManager, thumbnailCache, &playlistComponent};
-
+    DeckGUI deckGUI1{&player1, formatManager, thumbnailCache, &playlistComponent, juce::Colours::blue};
     // DjAudioPlayer for the second deck
     DJAudioPlayer player2{formatManager};
     // Second deck to control the dj player
-    DeckGUI deckGUI2{&player2, formatManager, thumbnailCache, &playlistComponent};
-
+    DeckGUI deckGUI2{&player2, formatManager, thumbnailCache, &playlistComponent, juce::Colours::red};
     // Mixer to combine both audio sources
     juce::MixerAudioSource mixerSource;
 

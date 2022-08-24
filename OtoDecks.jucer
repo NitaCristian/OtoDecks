@@ -2,7 +2,8 @@
 
 <JUCERPROJECT id="Etwl3Y" name="OtoDecks" projectType="guiapp" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;JUCE_USE_MP3AUDIOFORMAT=1">
+              defines="JUCE_MODAL_LOOPS_PERMITTED=1&#10;JUCE_USE_MP3AUDIOFORMAT=1"
+              cppLanguageStandard="17">
   <MAINGROUP id="fYVq2I" name="OtoDecks">
     <GROUP id="{2FEA71EE-D8BD-8564-74DD-DF371D3B4EF1}" name="Source">
       <FILE id="Di8SB0" name="DeckGUI.cpp" compile="1" resource="0" file="Source/DeckGUI.cpp"/>

@@ -3,22 +3,30 @@
 
 MyLookAndFeel::MyLookAndFeel() = default;
 
+MyLookAndFeel::MyLookAndFeel(juce::Colour primary) : primary(primary) {}
+
+// Taken from https://docs.juce.com/master/tutorial_look_and_feel_customisation.html
 void MyLookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
-                                     const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider &) {
+                                     const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider &slider) {
+    // Determine the radius
     auto radius = (float) juce::jmin(width / 2, height / 2) - 4.0f;
+    // Find the coordinates of the center point
     auto centreX = (float) x + (float) width * 0.5f;
     auto centreY = (float) y + (float) height * 0.5f;
+    // Find top left position of the rotary slider
     auto rx = centreX - radius;
     auto ry = centreY - radius;
+    // Calculate the diameter
     auto rw = radius * 2.0f;
+    // Calculate the angle of the pointer
     auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
 
     // fill
-    g.setColour(juce::Colours::blue);
+    g.setColour(primary);
     g.fillEllipse(rx, ry, rw, rw);
 
     // outline
-    g.setColour(juce::Colours::green);
+    g.setColour(juce::Colours::white);
     g.drawEllipse(rx, ry, rw, rw, 1.5f);
 
     juce::Path p;
@@ -28,13 +36,16 @@ void MyLookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width,
     p.applyTransform(juce::AffineTransform::rotation(angle).translated(centreX, centreY));
 
     // pointer
-    g.setColour(juce::Colours::yellow);
+    g.setColour(juce::Colours::white);
     g.fillPath(p);
+
+    // Draw the name of the slider
+    g.setColour(juce::Colours::white);
+    g.drawText(slider.getName(), x, y, width, height, juce::Justification::centredTop, true);
 }
 
-void
-MyLookAndFeel::drawButtonBackground(juce::Graphics &g, juce::Button &button, const juce::Colour &backgroundColour, bool,
-                                    bool isButtonDown) {
+// Taken from https://docs.juce.com/master/tutorial_look_and_feel_customisation.html
+void MyLookAndFeel::drawButtonBackground(juce::Graphics &g, juce::Button &button, const juce::Colour &backgroundColour, bool, bool isButtonDown) {
     auto buttonArea = button.getLocalBounds();
     auto edge = 4;
 
@@ -54,6 +65,7 @@ MyLookAndFeel::drawButtonBackground(juce::Graphics &g, juce::Button &button, con
     g.fillRect(buttonArea);
 }
 
+// Taken from https://docs.juce.com/master/tutorial_look_and_feel_customisation.html
 void MyLookAndFeel::drawButtonText(juce::Graphics &g, juce::TextButton &button, bool, bool isButtonDown) {
     auto font = getTextButtonFont(button, button.getHeight());
     g.setFont(font);
@@ -80,13 +92,14 @@ void MyLookAndFeel::drawButtonText(juce::Graphics &g, juce::TextButton &button, 
 
 void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
                                      float minSliderPos, float maxSliderPos, const juce::Slider::SliderStyle style,
-                                     juce::Slider &s) {
+                                     juce::Slider &slider) {
 
     if (style == juce::Slider::SliderStyle::LinearBarVertical) {
-        g.fillAll(juce::Colours::red);
+        g.fillAll(primary);
         g.fillRect(x, y, width, int(sliderPos));
-        g.setColour(juce::Colours::white);
-        g.drawText(s.getName(), x, y, width, height, juce::Justification::centredTop, true);
-    }
 
+        // Draw the name of the slider
+        g.setColour(juce::Colours::white);
+        g.drawText(slider.getName(), x, y, width, height, juce::Justification::centredTop, true);
+    }
 }

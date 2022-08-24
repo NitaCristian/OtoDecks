@@ -46,8 +46,10 @@ void MainComponent::paint(juce::Graphics &g) {
 
 void MainComponent::resized() {
     auto area = getLocalBounds();
+
     auto deckArea = area.removeFromTop(getHeight() / 2);
     deckGUI1.setBounds(deckArea.removeFromLeft(getWidth() / 2));
     deckGUI2.setBounds(deckArea.removeFromLeft(getWidth() / 2));
+
     playlistComponent.setBounds(area);
 }

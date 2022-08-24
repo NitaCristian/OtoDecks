@@ -121,8 +121,9 @@ public:
     // Inherited from TextEditor::Listener
 
     /**
+     * Callback to indicate that the user has changed the text inside a text editor
      *
-     * @param textEditor
+     * @param textEditor text editor that has changed
      */
     void textEditorTextChanged(juce::TextEditor &textEditor) override;
 
@@ -142,6 +143,11 @@ public:
      */
     int getFirstSelectedRow();
 
+    /**
+     * Method to get the first selected track from the table
+     *
+     * @returns the first selected track
+     */
     Track getFirstSelectedTrack();
 
     /**
@@ -149,18 +155,34 @@ public:
      */
     void updateTable();
 
+    /**
+     * Method to create a representation of a playlist out of every track in the table
+     *
+     * @returns representation of a playlist in string format
+     */
     juce::String createPlaylist();
 
-    // TODO - comments
-    // TODO - playlist file extension and checking
-    // todo - check uploaded file extension; findFormatForFileExtension() - audioformatmanager
-
+    /**
+     * Save the playlist contents in a file
+     *
+     * @param playlistFile file to save the contents
+     * @param contents content of playlist, every track as a string
+     */
     void savePlaylist(const juce::File &playlistFile, const juce::String &contents);
 
+    /**
+     * Load the contents of a playlist file in memory
+     *
+     * @param playlistFile file to load
+     */
     void loadPlaylist(const juce::File &playlistFile);
 
+    /**
+     * Method to refresh the contents of the filtered tracks vector
+     *
+     * @param text
+     */
     void updateFilteredTracks(const juce::String &text);
-
 private:
     // Custom LookAndFeel
     MyLookAndFeel myLookAndFeel;

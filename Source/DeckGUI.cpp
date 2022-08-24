@@ -1,15 +1,15 @@
 #include "DeckGUI.h"
 
-DeckGUI::DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent)
+DeckGUI::DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent,
+                 juce::Colour primary)
         : djAudioPlayer{player},
-          waveformDisplay(formatManager, cache, player),
-          playlist(playlistComponent) {
-    // TODO - REFACTOR
-    // 1. Remove unused elements
-    // 2. Introduce methods that initialize components, eg. initButton(button, text), initSlider(slider, min, max, val, style)
-    // 3. Clean up the initializer list
+          waveformDisplay(formatManager, cache, player, primary),
+          playlist(playlistComponent),
+          primary(primary) {
+    // General LookAndFeel
     setLookAndFeel(&customLookAndFeel);
 
+    // Initialize Buttons
     addAndMakeVisible(playButton);
     playButton.addListener(this);
     playButton.setButtonText("Play");
@@ -26,57 +26,45 @@ DeckGUI::DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager,
     loadButton.addListener(this);
     loadButton.setButtonText("Load");
 
+    // Initialize Sliders
     addAndMakeVisible(gainSlider);
     gainSlider.addListener(this);
     gainSlider.setName("Gain");
-    gainSlider.setRange(0.0, 1.0);
+    gainSlider.setRange(0.0, 1.0, 0.01);
     gainSlider.setValue(1.0);
     gainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, gainSlider.getTextBoxWidth(),
-                               gainSlider.getTextBoxHeight());
-
-    addAndMakeVisible(gainLabel);
-    gainLabel.setText("Gain", juce::dontSendNotification);
-    // gainLabel.attachToComponent(&gainSlider, true);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, gainSlider.getTextBoxWidth(), gainSlider.getTextBoxHeight());
 
     addAndMakeVisible(speedSlider);
     speedSlider.addListener(this);
-    speedSlider.setRange(1.0, 5.0);
+    speedSlider.setName("Speed");
+    speedSlider.setRange(0.25, 2.0, 0.25);
     speedSlider.setValue(1.0);
     speedSlider.setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
-    speedSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-
-    addAndMakeVisible(speedLabel);
-    speedLabel.setText("Speed", juce::dontSendNotification);
-    // speedLabel.attachToComponent(&speedSlider, true);
+    speedSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, speedSlider.getTextBoxWidth(), speedSlider.getTextBoxHeight());
 
     addAndMakeVisible(bassSlider);
     bassSlider.addListener(this);
+    bassSlider.setName("Bass");
     bassSlider.setRange(50.0, 10000.0);
     bassSlider.setValue(10000.0);
     bassSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    bassSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-
-    addAndMakeVisible(bassLabel);
-    bassLabel.setText("Bass", juce::dontSendNotification);
-    bassLabel.attachToComponent(&bassSlider, false);
+    bassSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, bassSlider.getTextBoxWidth(), bassSlider.getTextBoxHeight());
 
     addAndMakeVisible(trebleSlider);
     trebleSlider.addListener(this);
+    trebleSlider.setName("Treble");
     trebleSlider.setRange(50.0, 5000.0);
     trebleSlider.setValue(50.0);
     trebleSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-//    trebleSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    trebleSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, trebleSlider.getTextBoxWidth(),
-                                 trebleSlider.getTextBoxHeight());
+    trebleSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, trebleSlider.getTextBoxWidth(), trebleSlider.getTextBoxHeight());
 
-    addAndMakeVisible(trebleLabel);
-    trebleLabel.setText("Treble", juce::dontSendNotification);
-
+    // Initialize Track Name
     addAndMakeVisible(trackName);
     trackName.setText("No track", juce::dontSendNotification);
     trackName.setFont(juce::Font(32.0f));
 
+    // Initialize Waveform
     addAndMakeVisible(waveformDisplay);
 
     startTimer(500);
@@ -91,8 +79,8 @@ DeckGUI::~DeckGUI() {
 
 void DeckGUI::paint(juce::Graphics &g) {
     // Clear the background
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-    g.fillAll(juce::Colour::fromRGB(16, 7, 32));
+//    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+    g.fillAll(juce::Colours::black);
 
     // Draw an outline around the component
     g.setColour(juce::Colours::grey);
@@ -108,11 +96,11 @@ void DeckGUI::resized() {
 
     auto width = getWidth() / 4;
 
-    auto sliders = area.removeFromTop(4 * rowHeight);
-    bassSlider.setBounds(sliders.removeFromLeft(width).reduced(10));
-    trebleSlider.setBounds(sliders.removeFromLeft(width));
-    gainSlider.setBounds(sliders.removeFromLeft(width).reduced(10, 0));
-    speedSlider.setBounds(sliders.removeFromLeft(width));
+    auto sliderArea = area.removeFromTop(4 * rowHeight);
+    bassSlider.setBounds(sliderArea.removeFromLeft(width).reduced(10));
+    trebleSlider.setBounds(sliderArea.removeFromLeft(width).reduced(10));
+    gainSlider.setBounds(sliderArea.removeFromLeft(width).reduced(15, 5));
+    speedSlider.setBounds(sliderArea.removeFromLeft(width).reduced(15, 5));
 
     auto buttonArea = area.removeFromTop(rowHeight);
     playButton.setBounds(buttonArea.removeFromLeft(width));
@@ -170,11 +158,16 @@ bool DeckGUI::isInterestedInFileDrag(const juce::StringArray &files) {
 }
 
 void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y) {
-    auto file = juce::File{files[0]};
-    auto audioURL = juce::URL{file};
-    djAudioPlayer->loadURL(audioURL);
-    waveformDisplay.loadURL(audioURL);
-    playlist->insertUniqueTrack(Track(file));
+
+    for (auto i = 0; i < files.size(); i++) {
+        auto file = juce::File{files[i]};
+        auto audioURL = juce::URL{file};
+        if (i == 0) {
+            djAudioPlayer->loadURL(audioURL);
+            waveformDisplay.loadURL(audioURL);
+        }
+        playlist->insertUniqueTrack(Track(file));
+    }
 }
 
 //==============================================================================

@@ -3,8 +3,7 @@
 DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager &_formatManager) : formatManager(_formatManager) {
 }
 
-DJAudioPlayer::~DJAudioPlayer() {
-}
+DJAudioPlayer::~DJAudioPlayer() = default;
 
 //==============================================================================
 

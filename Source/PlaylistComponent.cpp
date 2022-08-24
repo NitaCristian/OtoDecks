@@ -85,7 +85,7 @@ void
 PlaylistComponent::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected) {
     g.fillAll(juce::Colours::darkgrey);
     if (rowIsSelected) {
-        g.fillAll(juce::Colours::orange);
+        g.fillAll(juce::Colours::greenyellow);
     }
 }
 
@@ -148,6 +148,7 @@ void PlaylistComponent::buttonClicked(juce::Button *button) {
         fChooser.launchAsync(fileChooserFlags,
                              [this](const juce::FileChooser &chooser) {
                                  auto file = chooser.getResult();
+                                 file = file.withFileExtension("otolist");
                                  savePlaylist(file, createPlaylist());
                              });
     }
@@ -156,12 +157,14 @@ void PlaylistComponent::buttonClicked(juce::Button *button) {
         fChooser.launchAsync(fileChooserFlags,
                              [this](const juce::FileChooser &chooser) {
                                  auto file = chooser.getResult();
-                                 loadPlaylist(file);
+                                 if (file.hasFileExtension("otolist"))
+                                     loadPlaylist(file);
                              });
         updateTable();
     }
     if (button == &clearPlaylist) {
         tracks.clear();
+        updateFilteredTracks(searchTrack.getText());
         updateTable();
     }
 }
@@ -240,16 +243,7 @@ juce::String PlaylistComponent::createPlaylist() {
 }
 
 void PlaylistComponent::savePlaylist(const juce::File &playlistFile, const juce::String &contents) {
-    // Create a temporary file
-    juce::TemporaryFile temporaryFile(playlistFile);
-    // Create an output stream
-    juce::FileOutputStream outputStream(temporaryFile.getFile());
-
-    outputStream.setNewLineString("\n");
-    outputStream.writeString(contents);
-    outputStream.flush();
-    // TODO-remove null character
-    temporaryFile.overwriteTargetFileWithTemporary();
+    playlistFile.replaceWithText(contents);
 }
 
 void PlaylistComponent::loadPlaylist(const juce::File &playlistFile) {

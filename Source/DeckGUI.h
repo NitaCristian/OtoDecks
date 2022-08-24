@@ -26,7 +26,8 @@ public:
      * @param cache manages multiple AudioThumbnail objects
      * @param playlistComponent a pointer to the playlist
      */
-    DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent);
+    DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent,
+            juce::Colour primary);
 
     /**
     * Destructor method used to deallocate memory and cleanup before the object is destroyed
@@ -82,7 +83,7 @@ public:
     /**
      * Callback to indicate that the user has dropped the files onto this component
      *
-     * @param files the set of paths of the files that the user is dragging
+     * @param files the set of paths of the files that the user has dropped
      * @param x the mouse x position
      * @param y the mouse y position
      */
@@ -97,6 +98,8 @@ public:
     void timerCallback() override;
 
 private:
+    // Primary colour of the LookAndFeel
+    juce::Colour primary;
     // Pointer to the playlist component
     PlaylistComponent *playlist;
     // Button to play an audio file
@@ -109,16 +112,12 @@ private:
     juce::TextButton loadButton;
     // Slider to control the gain
     juce::Slider gainSlider;
-    juce::Label gainLabel;
     // Slider to control the speed of the playback
     juce::Slider speedSlider;
-    juce::Label speedLabel;
     // Slider to control the bass filter
     juce::Slider bassSlider;
-    juce::Label bassLabel;
     // Slider to control the treble filter
     juce::Slider trebleSlider;
-    juce::Label trebleLabel;
     // Pointer to the DJAudioPlayer for this deck
     DJAudioPlayer *djAudioPlayer;
     // Label for the track name
@@ -129,7 +128,7 @@ private:
     juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory),
                                "*.mp3"};
     // Custom LookAndFeel class for buttons and rotary sliders
-    MyLookAndFeel customLookAndFeel;
+    MyLookAndFeel customLookAndFeel{primary};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)
 };

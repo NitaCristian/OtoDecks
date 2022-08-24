@@ -1,10 +1,11 @@
 #include "WaveformDisplay.h"
 
-WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *_djAudioPlayer)
+WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *_djAudioPlayer,
+                                 juce::Colour primary)
         : audioThumbnail(1000, formatManagerToUse, cacheToUse),
           fileLoaded(false),
           position(0.0),
-          djAudioPlayer(_djAudioPlayer) {
+          djAudioPlayer(_djAudioPlayer), primary(primary) {
     audioThumbnail.addChangeListener(this);
 }
 
@@ -23,13 +24,13 @@ void WaveformDisplay::paint(juce::Graphics &g) {
 
     if (!fileLoaded) {
         g.setFont(20.0f);
-        g.setColour(juce::Colours::orange);
+        g.setColour(primary);
         // Draw some placeholder text
         g.drawText("File not loaded", getLocalBounds(), juce::Justification::centred, true);
         return;
     }
 
-    g.setColour(juce::Colours::orange);
+    g.setColour(primary);
     // Get the local bounds of the component
     auto area = getLocalBounds();
     // Set the height of the waveform of one channel
@@ -40,8 +41,11 @@ void WaveformDisplay::paint(juce::Graphics &g) {
     audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveformHeight), 0, audioThumbnail.getTotalLength(), 1, 1);
 
     // Draw an indicator of the current position
-    g.setColour(juce::Colours::lightgreen);
-    g.drawRect(position * getWidth(), 0, getWidth() / 25, getHeight());
+    auto width = getWidth() / 50;
+    const auto indicatorPosition = position * getWidth();
+
+    g.setColour(juce::Colours::greenyellow);
+    g.drawRect(indicatorPosition - width / 2, 0, width, getHeight());
 }
 
 void WaveformDisplay::resized() {
