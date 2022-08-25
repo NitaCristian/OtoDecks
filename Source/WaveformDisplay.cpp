@@ -1,16 +1,15 @@
 #include "WaveformDisplay.h"
 
 WaveformDisplay::WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *_djAudioPlayer,
-                                 juce::Colour primary)
+                                 juce::Colour colour)
         : audioThumbnail(1000, formatManagerToUse, cacheToUse),
           fileLoaded(false),
           position(0.0),
-          djAudioPlayer(_djAudioPlayer), primary(primary) {
+          djAudioPlayer(_djAudioPlayer), colour(colour) {
     audioThumbnail.addChangeListener(this);
 }
 
-WaveformDisplay::~WaveformDisplay() {
-}
+WaveformDisplay::~WaveformDisplay() = default;
 
 //==============================================================================
 
@@ -24,13 +23,13 @@ void WaveformDisplay::paint(juce::Graphics &g) {
 
     if (!fileLoaded) {
         g.setFont(20.0f);
-        g.setColour(primary);
+        g.setColour(colour);
         // Draw some placeholder text
         g.drawText("File not loaded", getLocalBounds(), juce::Justification::centred, true);
         return;
     }
 
-    g.setColour(primary);
+    g.setColour(colour);
     // Get the local bounds of the component
     auto area = getLocalBounds();
     // Set the height of the waveform of one channel

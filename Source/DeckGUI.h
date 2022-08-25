@@ -27,7 +27,7 @@ public:
      * @param playlistComponent a pointer to the playlist
      */
     DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent,
-            juce::Colour primary);
+            juce::Colour colour);
 
     /**
     * Destructor method used to deallocate memory and cleanup before the object is destroyed
@@ -98,8 +98,6 @@ public:
     void timerCallback() override;
 
 private:
-    // Primary colour of the LookAndFeel
-    juce::Colour primary;
     // Pointer to the playlist component
     PlaylistComponent *playlist;
     // Button to play an audio file
@@ -128,7 +126,7 @@ private:
     juce::FileChooser fChooser{"Select a file...", juce::File::getSpecialLocation(juce::File::userMusicDirectory),
                                "*.mp3"};
     // Custom LookAndFeel class for buttons and rotary sliders
-    MyLookAndFeel customLookAndFeel{primary};
+    MyLookAndFeel customLookAndFeel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)
 };

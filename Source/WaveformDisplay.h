@@ -16,7 +16,7 @@ public:
      * @param cacheToUse manages multiple AudioThumbnail objects
      * @param djAudioPlayer pointer to the corresponding DJAudioPlayer
      */
-    WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *djAudioPlayer, juce::Colour primary);
+    WaveformDisplay(juce::AudioFormatManager &formatManagerToUse, juce::AudioThumbnailCache &cacheToUse, DJAudioPlayer *djAudioPlayer, juce::Colour colour);
 
     /**
      * Destructor method used to deallocate memory and cleanup before the object is destroyed
@@ -88,7 +88,8 @@ private:
     // Pointer to its corresponding DJAudioPlayer
     DJAudioPlayer *djAudioPlayer;
 
-    juce::Colour primary;
+    // Colour of the waveform display
+    juce::Colour colour;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformDisplay)

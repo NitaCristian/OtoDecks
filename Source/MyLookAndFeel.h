@@ -9,14 +9,13 @@ class MyLookAndFeel : public juce::LookAndFeel_V4 {
 public:
     MyLookAndFeel();
 
-    explicit MyLookAndFeel(juce::Colour primary);
+    explicit MyLookAndFeel(juce::Colour colour);
 
     //==============================================================================
     // Taken from https://docs.juce.com/master/tutorial_look_and_feel_customisation.html
 
     // Method that overrides the design of a slider with a style of Rotary
-    void
-    drawRotarySlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider &)
+    void drawRotarySlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider &)
     override;
 
     // Method that overrides the background of a button
@@ -32,5 +31,5 @@ public:
 private:
     // Primary colour of the LookAndFeel
     // It will make buttons and sliders blue, red, etc.
-    juce::Colour primary;
+    juce::Colour colour;
 };

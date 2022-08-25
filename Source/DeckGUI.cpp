@@ -1,11 +1,11 @@
 #include "DeckGUI.h"
 
 DeckGUI::DeckGUI(DJAudioPlayer *player, juce::AudioFormatManager &formatManager, juce::AudioThumbnailCache &cache, PlaylistComponent *playlistComponent,
-                 juce::Colour primary)
+                 juce::Colour colour)
         : djAudioPlayer{player},
-          waveformDisplay(formatManager, cache, player, primary),
+          waveformDisplay(formatManager, cache, player, colour),
           playlist(playlistComponent),
-          primary(primary) {
+          customLookAndFeel{colour} {
     // General LookAndFeel
     setLookAndFeel(&customLookAndFeel);
 

@@ -3,7 +3,7 @@
 
 MyLookAndFeel::MyLookAndFeel() = default;
 
-MyLookAndFeel::MyLookAndFeel(juce::Colour primary) : primary(primary) {}
+MyLookAndFeel::MyLookAndFeel(juce::Colour colour) : colour(colour) {}
 
 // Taken from https://docs.juce.com/master/tutorial_look_and_feel_customisation.html
 void MyLookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width, int height, float sliderPos,
@@ -22,7 +22,7 @@ void MyLookAndFeel::drawRotarySlider(juce::Graphics &g, int x, int y, int width,
     auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
 
     // fill
-    g.setColour(primary);
+    g.setColour(colour);
     g.fillEllipse(rx, ry, rw, rw);
 
     // outline
@@ -95,7 +95,7 @@ void MyLookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width,
                                      juce::Slider &slider) {
 
     if (style == juce::Slider::SliderStyle::LinearBarVertical) {
-        g.fillAll(primary);
+        g.fillAll(colour);
         g.fillRect(x, y, width, int(sliderPos));
 
         // Draw the name of the slider
