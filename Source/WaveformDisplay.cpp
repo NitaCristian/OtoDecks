@@ -36,8 +36,8 @@ void WaveformDisplay::paint(juce::Graphics &g) {
     auto channelWaveformHeight = getHeight() / 2;
 
     // Draw the waveform for the two channels
-    audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveformHeight), 0, audioThumbnail.getTotalLength(), 0, 1);
-    audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveformHeight), 0, audioThumbnail.getTotalLength(), 1, 1);
+    audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveformHeight), 0, audioThumbnail.getTotalLength(), 0, 0.7);
+    audioThumbnail.drawChannel(g, area.removeFromTop(channelWaveformHeight), 0, audioThumbnail.getTotalLength(), 1, 0.7);
 
     // Draw an indicator of the current position
     auto width = getWidth() / 50;

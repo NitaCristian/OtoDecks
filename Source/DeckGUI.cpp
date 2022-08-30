@@ -165,6 +165,7 @@ void DeckGUI::filesDropped(const juce::StringArray &files, int x, int y) {
         if (i == 0) {
             djAudioPlayer->loadURL(audioURL);
             waveformDisplay.loadURL(audioURL);
+            trackName.setText(file.getFileNameWithoutExtension(), juce::dontSendNotification);
         }
         playlist->insertUniqueTrack(Track(file));
     }

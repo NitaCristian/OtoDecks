@@ -71,7 +71,7 @@ void PlaylistComponent::resized() {
     loadPlaylistBtn.setBounds(buttonsArea.removeFromTop(buttonHeight));
     clearPlaylist.setBounds(buttonsArea.removeFromTop(buttonHeight));
 
-    searchTrack.setBounds(area.removeFromTop(50));
+    searchTrack.setBounds(area.removeFromTop(30));
     tableComponent.setBounds(area);
 }
 
